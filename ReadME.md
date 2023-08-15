@@ -14,7 +14,7 @@ Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW
 
 Check Examples to Get Overview.
 
-# Here is the Exmaple code and Explanation to the Implemetation of Zoom-In Feature.
+# Here is the Example code and Explanation to the Implemetation of Zoom-In Feature.
 
 ### FIRST CREATE A UDP CLIENT TO CONNECT TO THE CAMERA
 ```

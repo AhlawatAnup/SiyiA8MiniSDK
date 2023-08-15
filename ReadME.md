@@ -12,7 +12,7 @@ The Siyi A8 Mini Camera Node.js SDK allows developers to easily integrate the Si
 Currently it supports
 Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW
 
-Check Example to Get Overview.
+Check Examples to Get Overview.
 
 # Here is the Exmaple code and Explanation to the Implemetation of Zoom-In Feature.
 

@@ -1,15 +1,69 @@
 Siyi A8 Mini Camera Node.js SDK
-Siyi A8 Mini Camera
 
-The Siyi A8 Mini Camera Node.js SDK is a powerful tool that allows developers to easily integrate the Siyi A8 Mini camera into their Node.js applications. With this SDK, you can access the camera's features and functionalities programmatically, enabling seamless control and interaction with the camera.
+*** THIS IS OPEN SOURCE IMPLEMENTAION CHANGES AND AND ERROR REQUEST WILL BE APPRECIATED.***
 
-Features
-Simple Integration: Effortlessly integrate the Siyi A8 Mini camera into your Node.js applications using a user-friendly and well-documented SDK.
+This is the Node Js implementation of Siyi Camera SDK.
 
-Capture Media: Capture photos and record videos directly from your Node.js application using the camera's capabilities.
+The Siyi A8 Mini Camera Node.js SDK allows developers to easily integrate the Siyi A8 Mini camera into their Node.js applications. With this short SDK/library, you can access the camera's features and functionalities programmatically, enabling seamless control and interaction with the camera.
 
-Real-time Streaming: Stream live video from the camera to your application, enabling real-time monitoring and interaction.
+Features:
+Currently it supports
+Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW
 
-Configuration Control: Adjust camera settings such as resolution, exposure, focus, and more to suit your application's requirements.
+Check Example to Get Overview.
 
-Event Handling: Receive and handle camera events, such as motion detection, to trigger specific actions in your application.
+Here is the Exmaple code and Explanation to the Implemetation of Zoom-In Feature.
+===============================================
+// FIRST CREATE A UDP CLIENT TO CONNECT TO THE CAMERA
+const dgram = require("dgram");
+const siYiCameraClient = dgram.createSocket("udp4"); //CREATING A UDP SOCKET TO CONNECT TO THE CAMERA
+
+// NOW IMPORT NODE JS SDK CLASS AND CREATE A OBJECT TO USE IT
+const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS
+const mySiyiCamera = new SiyiA8SDK();
+
+//NOW I DECLARED A UDP CLIENT CREDENTIALS TO CONNECT LIKE AS:
+const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE CAMERA's IP ADDRESS
+const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED
+
+//NOW SEND ZOOM IN COMMAND TO CAMERA  
+
+siYiCameraClient.send(
+  mySiyiCamera.start_zoom(),
+  SIYI_CAMERA_UDP_PORT,
+  SIYI_CAMERA_UDP_IP_ADDERSS,
+  (err) => {
+    if (err) {
+      console.error("Error sending data:", err);
+    } else {
+      console.log("Good Command");
+    }
+  }
+);
+
+
+// AFTER THIS COMMAND CAMERA WILL START ZOOM IN AND TO STOP THE CAMERA I USED "setTimeout" TO STOP IT AFTER A SPECIFIC TIME ABSOLUTE ZOOM COMMAND WILL WORK IN UPPSER SIYI CAMERA MODELS BUT NOT IN A8 MINI SO WE HAVE TO HANDLE THE STOP LIKE THIS FOR MORE INFO I HAVE ATTACHED THE PDF OF MANUAL.
+
+//TO HAVE TO STOP ZOOM OTHER WISE IT WILL STOP AT FULL ZOOM. YOU CAN REDUCE THE TIMEOUT
+setTimeout(() => {
+  siYiCameraClient.send(
+    mySiyiCamera.stop_zoom(),
+    SIYI_CAMERA_UDP_PORT,
+    SIYI_CAMERA_UDP_IP_ADDERSS,
+    (err) => {
+      if (err) {
+        console.error("Error sending data:", err);
+      } else {
+        console.log("Good Command");
+      }
+    }
+  );
+}, 500);
+
+
+//AS THE UDP CONNECTION IS BIDERCTIONAL CAMERA WILL SEND THE ACKNOWLEDGEMENT AND DATA TO THE CAMMMNADS WHICH REQUIRES IT
+
+siYiCameraClient.on("message", (response) => {
+  console.log(`Received response from Camera: ${response.toString("hex")}`);
+});
+

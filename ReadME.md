@@ -51,7 +51,7 @@ siYiCameraClient.send(
 ##### After this command camera will start zoom-in and to stop the camera i used "setTimeout" ,Absolute zoom command will work in upper SiYi camera models but not in a8 mini so we have to handle the stop like this for more info I have attached the PDF of manual. This is general SDK and will work with most of the SiYi Camera. This has been Tested in node js on Raspberry Pi , Windows 10 and ubuntu 22 for SiYi A8 Mini.
 
 
-### TO STOP ZOOM OTHER WISE IT WILL STOP AT FULL ZOOM. YOU CAN REDUCE THE TIMEOUT
+### TO STOP ZOOM (IF NOT STOPPED CAMERA WILL STOP AT FULL ZOOM. YOU CAN CUSTOISE THE TIMEOUT AS PER NEED)
 ```
 setTimeout(() => {  
   siYiCameraClient.send(  

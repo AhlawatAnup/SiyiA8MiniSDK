@@ -68,7 +68,7 @@ setTimeout(() => {
   );  
 }, 500);  
 ```
-### AS THE UDP CONNECTION IS BIDERCTIONAL CAMERA WILL SEND THE ACKNOWLEDGEMENT AND DATA TO THE CAMMMNADS WHICH REQUIRES IT LISTEN TO THE CAMERA ACKNOWLEGEMENT
+### TO LISTEN TO CAMERA ACKNOWLEDGEMENT
 ```
 siYiCameraClient.on("message", (response) => {  
   console.log(`Received response from Camera: ${response.toString("hex")}`);  

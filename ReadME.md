@@ -23,29 +23,29 @@ const siYiCameraClient = dgram.createSocket("udp4");
 
 // NOW IMPORT NODE JS SDK CLASS AND CREATE A OBJECT TO USE IT
 =
-const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS
-const mySiyiCamera = new SiyiA8SDK();
+const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS  
+const mySiyiCamera = new SiyiA8SDK();  
 
 //NOW I DECLARED A UDP CLIENT CREDENTIALS TO CONNECT LIKE AS:
 =
-const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE CAMERA's IP ADDRESS
-const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED
+const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE CAMERA's IP ADDRESS  
+const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED  
 
 //NOW SEND ZOOM IN COMMAND TO CAMERA  
 =
 
-siYiCameraClient.send(
-  mySiyiCamera.start_zoom(),
-  SIYI_CAMERA_UDP_PORT,
-  SIYI_CAMERA_UDP_IP_ADDERSS,
-  (err) => {
-    if (err) {
-      console.error("Error sending data:", err);
-    } else {
-      console.log("Good Command");
-    }
-  }
-);
+siYiCameraClient.send(  
+  mySiyiCamera.start_zoom(),  
+  SIYI_CAMERA_UDP_PORT,  
+  SIYI_CAMERA_UDP_IP_ADDERSS,  
+  (err) => {  
+    if (err) {  
+      console.error("Error sending data:", err);  
+    } else {  
+      console.log("Good Command");  
+    }  
+  }  
+);  
 
 
 // AFTER THIS COMMAND CAMERA WILL START ZOOM IN AND TO STOP THE CAMERA I USED "setTimeout" TO STOP IT AFTER A SPECIFIC TIME ABSOLUTE ZOOM COMMAND WILL WORK IN UPPSER SIYI CAMERA MODELS BUT NOT IN A8 MINI SO WE HAVE TO HANDLE THE STOP LIKE THIS FOR MORE INFO I HAVE ATTACHED THE PDF OF MANUAL.
@@ -53,26 +53,26 @@ siYiCameraClient.send(
 
 //TO HAVE TO STOP ZOOM OTHER WISE IT WILL STOP AT FULL ZOOM. YOU CAN REDUCE THE TIMEOUT
 =
-setTimeout(() => {
-  siYiCameraClient.send(
-    mySiyiCamera.stop_zoom(),
-    SIYI_CAMERA_UDP_PORT,
-    SIYI_CAMERA_UDP_IP_ADDERSS,
-    (err) => {
-      if (err) {
-        console.error("Error sending data:", err);
-      } else {
-        console.log("Good Command");
-      }
-    }
-  );
-}, 500);
+setTimeout(() => {  
+  siYiCameraClient.send(  
+    mySiyiCamera.stop_zoom(),  
+    SIYI_CAMERA_UDP_PORT,  
+    SIYI_CAMERA_UDP_IP_ADDERSS,  
+    (err) => {  
+      if (err) {  
+        console.error("Error sending data:", err);  
+      } else {  
+        console.log("Good Command");  
+      }  
+    }  
+  );  
+}, 500);  
 
 
 //AS THE UDP CONNECTION IS BIDERCTIONAL CAMERA WILL SEND THE ACKNOWLEDGEMENT AND DATA TO THE CAMMMNADS WHICH REQUIRES IT
 //LISTEN TO THE CAMERA ACKNOWLEGEMENT
 =
-siYiCameraClient.on("message", (response) => {
-  console.log(`Received response from Camera: ${response.toString("hex")}`);
-});
+siYiCameraClient.on("message", (response) => {  
+  console.log(`Received response from Camera: ${response.toString("hex")}`);  
+});  
 

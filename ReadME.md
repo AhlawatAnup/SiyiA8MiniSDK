@@ -1,6 +1,7 @@
 Siyi A8 Mini Camera Node.js SDK
 
 *** THIS IS OPEN SOURCE IMPLEMENTAION CHANGES AND AND ERROR REQUEST WILL BE APPRECIATED.***
+=
 
 This is the Node Js implementation of Siyi Camera SDK.
 
@@ -15,18 +16,22 @@ Check Example to Get Overview.
 Here is the Exmaple code and Explanation to the Implemetation of Zoom-In Feature.
 ===============================================
 // FIRST CREATE A UDP CLIENT TO CONNECT TO THE CAMERA
+=
 const dgram = require("dgram");
 const siYiCameraClient = dgram.createSocket("udp4"); //CREATING A UDP SOCKET TO CONNECT TO THE CAMERA
 
 // NOW IMPORT NODE JS SDK CLASS AND CREATE A OBJECT TO USE IT
+=
 const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS
 const mySiyiCamera = new SiyiA8SDK();
 
 //NOW I DECLARED A UDP CLIENT CREDENTIALS TO CONNECT LIKE AS:
+=
 const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE CAMERA's IP ADDRESS
 const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED
 
 //NOW SEND ZOOM IN COMMAND TO CAMERA  
+=
 
 siYiCameraClient.send(
   mySiyiCamera.start_zoom(),
@@ -44,7 +49,9 @@ siYiCameraClient.send(
 
 // AFTER THIS COMMAND CAMERA WILL START ZOOM IN AND TO STOP THE CAMERA I USED "setTimeout" TO STOP IT AFTER A SPECIFIC TIME ABSOLUTE ZOOM COMMAND WILL WORK IN UPPSER SIYI CAMERA MODELS BUT NOT IN A8 MINI SO WE HAVE TO HANDLE THE STOP LIKE THIS FOR MORE INFO I HAVE ATTACHED THE PDF OF MANUAL.
 
+
 //TO HAVE TO STOP ZOOM OTHER WISE IT WILL STOP AT FULL ZOOM. YOU CAN REDUCE THE TIMEOUT
+=
 setTimeout(() => {
   siYiCameraClient.send(
     mySiyiCamera.stop_zoom(),

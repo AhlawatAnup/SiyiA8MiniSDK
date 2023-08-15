@@ -1,6 +1,6 @@
 Siyi A8 Mini Camera Node.js SDK
 
-*** THIS IS OPEN SOURCE IMPLEMENTAION CHANGES AND AND ERROR REQUEST WILL BE APPRECIATED.***
+*** THIS IS OPEN SOURCE IMPLEMENTATION, CHANGES AND ERROR REQUEST WILL BE APPRECIATED.***
 =
 
 This is the Node Js implementation of Siyi Camera SDK.
@@ -8,6 +8,7 @@ This is the Node Js implementation of Siyi Camera SDK.
 The Siyi A8 Mini Camera Node.js SDK allows developers to easily integrate the Siyi A8 Mini camera into their Node.js applications. With this short SDK/library, you can access the camera's features and functionalities programmatically, enabling seamless control and interaction with the camera.
 
 Features:
+=
 Currently it supports
 Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW
 
@@ -69,7 +70,8 @@ setTimeout(() => {
 
 
 //AS THE UDP CONNECTION IS BIDERCTIONAL CAMERA WILL SEND THE ACKNOWLEDGEMENT AND DATA TO THE CAMMMNADS WHICH REQUIRES IT
-
+//LISTEN TO THE CAMERA ACKNOWLEGEMENT
+=
 siYiCameraClient.on("message", (response) => {
   console.log(`Received response from Camera: ${response.toString("hex")}`);
 });

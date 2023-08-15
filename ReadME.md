@@ -18,8 +18,8 @@ Here is the Exmaple code and Explanation to the Implemetation of Zoom-In Feature
 ===============================================
 // FIRST CREATE A UDP CLIENT TO CONNECT TO THE CAMERA
 =
-const dgram = require("dgram");
-const siYiCameraClient = dgram.createSocket("udp4"); //CREATING A UDP SOCKET TO CONNECT TO THE CAMERA
+const dgram = require("dgram");  
+const siYiCameraClient = dgram.createSocket("udp4");   
 
 // NOW IMPORT NODE JS SDK CLASS AND CREATE A OBJECT TO USE IT
 =

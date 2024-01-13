@@ -8,6 +8,7 @@ const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE C
 const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED
 
 console.log("Starting Pitch");
+
 siYiCameraClient.send(
   mySiyiCamera.gimbal_rotate_command("00", "d8"),
   SIYI_CAMERA_UDP_PORT,

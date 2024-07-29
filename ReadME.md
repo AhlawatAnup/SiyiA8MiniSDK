@@ -1,7 +1,6 @@
-# Siyi A8 Mini Camera Node.js SDK
+# Siyi A8 Mini Camera Node.js SDK v1.0.1
 
 ## THIS IS OPEN SOURCE IMPLEMENTATION, CHANGES AND ERROR REQUEST WILL BE APPRECIATED
-
 
 This is the Node Js implementation of Siyi Camera SDK.
 
@@ -17,60 +16,64 @@ Check Examples to Get Overview.
 # Here is the Example code and Explanation to the Implemetation of Zoom-In Feature.
 
 ### FIRST CREATE A UDP CLIENT TO CONNECT TO THE CAMERA
+
 ```
-const dgram = require("dgram");  
-const siYiCameraClient = dgram.createSocket("udp4");   
+const dgram = require("dgram");
+const siYiCameraClient = dgram.createSocket("udp4");
 ```
+
 ### NOW IMPORT NODE JS SDK CLASS AND CREATE A OBJECT TO USE IT
+
 ```
-const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS  
-const mySiyiCamera = new SiyiA8SDK();  
+const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS
+const mySiyiCamera = new SiyiA8SDK();
 ```
+
 ### NOW I DECLARED A UDP CLIENT CREDENTIALS TO CONNECT LIKE AS:
-```
-const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE CAMERA's IP ADDRESS  
-const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED  
-```
-### NOW SEND ZOOM IN COMMAND TO CAMERA  
-```
-
-siYiCameraClient.send(  
-  mySiyiCamera.start_zoom(),  
-  SIYI_CAMERA_UDP_PORT,  
-  SIYI_CAMERA_UDP_IP_ADDERSS,  
-  (err) => {  
-    if (err) {  
-      console.error("Error sending data:", err);  
-    } else {  
-      console.log("Good Command");  
-    }  
-  }  
-);  
 
 ```
+
+const SIYI_CAMERA_UDP_IP_ADDERSS = "YOUR_SIYI_IP_ADDRESS"; // REPLACE WITH THE CAMERA's IP ADDRESS
+const SIYI_CAMERA_UDP_PORT = 37260; // THIS IS THE DEFAULT PORT CHANGE AS PER NEED
+
+// CONNECT TO UDP SOCKET
+siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDERSS);
+
+// ATTACHING SOME COMMON LISTENER
+siYiCameraClient.on("connect", () => {
+  console.log("Connected to Camera");
+});
+
+siYiCameraClient.on("error", () => {
+  console.log("Error Connecting to Camera");
+});
+
+```
+
+### NOW SEND ZOOM IN COMMAND TO CAMERA
+
+```
+
+siYiCameraClient.send(mySiyiCamera.start_zoom());
+
+```
+
 ##### After this command camera will start zoom-in and to stop the camera i used "setTimeout" ,Absolute zoom command will work in upper SiYi camera models but not in a8 mini so we have to handle the stop like this for more info I have attached the PDF of manual. This is general SDK and will work with most of the SiYi Camera. This has been Tested in node js on Raspberry Pi , Windows 10 and ubuntu 22 for SiYi A8 Mini.
 
+### TO STOP ZOOM (IF NOT STOPPED CAMERA WILL STOP AT FULL ZOOM. YOU CAN CUSTOMIZE THE TIMEOUT AS PER NEED)
 
-### TO STOP ZOOM (IF NOT STOPPED CAMERA WILL STOP AT FULL ZOOM. YOU CAN CUSTOMISE THE TIMEOUT AS PER NEED)
 ```
-setTimeout(() => {  
-  siYiCameraClient.send(  
-    mySiyiCamera.stop_zoom(),  
-    SIYI_CAMERA_UDP_PORT,  
-    SIYI_CAMERA_UDP_IP_ADDERSS,  
-    (err) => {  
-      if (err) {  
-        console.error("Error sending data:", err);  
-      } else {  
-        console.log("Good Command");  
-      }  
-    }  
-  );  
-}, 500);  
+setTimeout(() => {
+  console.log("Stopping Zoom");
+  siYiCameraClient.send(mySiyiCamera.stop_zoom());
+}, 500);
 ```
+
 ### TO LISTEN TO CAMERA ACKNOWLEDGEMENT
+
 ```
-siYiCameraClient.on("message", (response) => {  
-  console.log(`Received response from Camera: ${response.toString("hex")}`);  
-});  
+siYiCameraClient.on("message", (response) => {
+  console.log("Received Response Buffer from Camera : ", response);
+});
+
 ```

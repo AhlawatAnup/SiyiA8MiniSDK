@@ -1,6 +1,6 @@
 {
   "name": "siyia8mini",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This is Javascript Implementation of Siyi A8 Mini SDK with features like Zoom-In, Zoom-Out, movements and all. It has been tested on Node js In Raspberry Pi , Windows and Linux 22.",
   "main": "index.js",
   "scripts": {

@@ -48,3 +48,16 @@ siYiCameraClient.on("message", (response) => {
 mySiyiCamera.on("FUNCTION_FEEDBACK_INFO", (data) => {
   console.log(data);
 });
+
+/*
+FUNCTION_FEEDBACK_INFO
+
+
+0: SUCCESS
+1: FAIL TO TAKE A PHOTO (PLEASE CHECK 
+   IF TF CARD IS INSERTED)
+2: HDR ON
+3: HDR OFF
+4: FAIL TO RECORD A VIDEO (PLEASE CHECK 
+   IF TF CARD IS INSERTED)
+*/

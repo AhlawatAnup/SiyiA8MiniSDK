@@ -9,7 +9,12 @@ The Siyi A8 Mini Camera Node.js SDK allows developers to easily integrate the Si
 ### Features:
 
 Currently it supports
-Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW
+Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW, Read Firmware Version,Rea Camera Codec Info, Send Camera Codec Info , Trigger Photo and Video Capture.
+
+### v1.0.1
+
+Added
+Buffer Parser: This feature aids in interpreting the camera response in a more readable format(can be accessed by dot notation) .
 
 Check Examples to Get Overview.
 
@@ -74,6 +79,64 @@ setTimeout(() => {
 ```
 siYiCameraClient.on("message", (response) => {
   console.log("Received Response Buffer from Camera : ", response);
+   mySiyiCamera.parseBuffer(response);
 });
+
+mySiyiCamera.on("SOME_EVENT", (data) => {
+  console.log(data);
+});
+
+```
+
+### (NEW) EXAMPLE : FOR READING CAMERA FIRMWARE
+
+```
+siYiCameraClient.on("connect", () => {
+  console.log("Connected to Camera");
+
+  // SENDING FIRMWARE READ REQUEST
+  siYiCameraClient.send(mySiyiCamera.request_camera_fw_version());
+});
+
+siYiCameraClient.on("error", () => {
+  console.log("Error Connecting to Camera");
+});
+
+console.log("Getting FW Version");
+
+siYiCameraClient.on("message", (response) => {
+  // console.log("Received Response Buffer from Camera : ", response);
+  mySiyiCamera.parseBuffer(response);
+});
+
+mySiyiCamera.on("FIRMWARE_VERSION", (data) => {
+  console.log(data);
+});
+```
+
+### READING FIRWARE ACKNOWLEDGEMENT
+
+```
+siYiCameraClient.on("message", (response) => {
+  mySiyiCamera.parseBuffer(response);
+});
+
+// ATTACH A LISTENER
+mySiyiCamera.on("FIRMWARE_VERSION", (data) => {
+  console.log(data);
+});
+
+```
+
+### FIRMWARE READ OUTPUT
+
+```
+{
+  code_board_ver: '0.2.6',
+  gimbal_firmware_ver: '0.3.7',
+  zoom_firmware_ver: 'Not Supported'
+}
+
+** As I have SiYi A8 mini it doesn't have zoom firmware support
 
 ```

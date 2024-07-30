@@ -1,7 +1,21 @@
+const events = require("node:events");
+util = require("util");
+
 // Declaring a Class
 class SiyiA8SDK {
-  constructor() {}
+  constructor() {
+    // this.eventEmitter = new EventEmitter();
+  }
 
+  // PROTOCOL CONSTANTS
+  PROT_CONSTANT = {
+    STX_INDEX: 0, // 2 BYTE
+    CTRL_INDEX: 2, // 1 BYTE
+    DATA_LEN_INDEX: 3, // 2 BYTES
+    SEQ_INDEX: 5, // 1 BYTE
+    COMMAND_ID_INDEX: 7, // 1 BYTE
+    DATA_INDEX: 8, // DATA LENGTH BYTES
+  };
   //COMMAND ID (1 BYTE) ...DEFINING THE COMMANDS IDs.
   //REFER TO THE A8_MINI_MANUAL.PDF( ATTACHED).FOR MORE IDS CURENTLY THESE 3 ARE IMPLEMENTED
   COMMAND_ID = {
@@ -19,7 +33,9 @@ class SiyiA8SDK {
     CAMERA_PRESENT_WORKING_MODE: "19",
     CAMERA_CODEC_SPEC: "20",
     SEND_CODEC_SPEC: "21",
+    GIMBAL_CONFIG_INFO: "0a",
     PHOTO_AND_VIDEO: "0C",
+    FUNCTION_FEEDBACK_INFO: "0B",
   };
 
   //   COMMAND HEADER STX+ CTRL (2+ 1 BYTES)
@@ -184,6 +200,7 @@ class SiyiA8SDK {
     );
   }
 
+  // REQUEST CAMERA CODEC
   request_camera_codec(stream_type) {
     const request_camera_codec_spec_command =
       this.command_header() +
@@ -203,6 +220,23 @@ class SiyiA8SDK {
     );
   }
 
+  // REQUEST GIMBAL CONFIGURATION INFO
+  request_gimbal_configuaration_info() {
+    const gimbal_config_info_command =
+      this.command_header() +
+      this.data_len("0000") +
+      this.sequence("0000") +
+      this.COMMAND_ID.GIMBAL_CONFIG_INFO +
+      "";
+    console.log("REQUEST GIMBAL CONFIG ...");
+    return Buffer.from(
+      gimbal_config_info_command + "0f75",
+      // this.verify_command(gimbal_config_info_command).toString(16),
+      "hex"
+    );
+  }
+
+  // REQUEST FW VERSION
   request_camera_fw_version() {
     const request_camera_fw_version_command =
       this.command_header() +
@@ -210,17 +244,175 @@ class SiyiA8SDK {
       this.sequence("0000") +
       this.COMMAND_ID.CAMERA_FIRMWARE_VERSION +
       "";
-    console.log(
-      this.verify_command(request_camera_fw_version_command).toString(16),
-      "  :",
-      request_camera_fw_version_command
-    );
+    console.log("FIRMWARE VERSION REQUEST");
     return Buffer.from(
       request_camera_fw_version_command +
         this.verify_command(request_camera_fw_version_command).toString(16),
       "hex"
     );
   }
+
+  // SEND CAMERA CODEC TO CAMERA
+  send_camera_codec() {
+    const send_camera_codec_command =
+      this.command_header() +
+      this.data_len("0900") +
+      this.sequence("0000") +
+      this.COMMAND_ID.SEND_CODEC_SPEC +
+      "01" +
+      "02" +
+      "80" +
+      "07" +
+      "38" +
+      "04" +
+      "A0" +
+      "0F" +
+      "00";
+    console.log(
+      this.verify_command(send_camera_codec_command).toString(16),
+      "  :",
+      send_camera_codec_command
+    );
+    return Buffer.from(
+      send_camera_codec_command +
+        this.verify_command(send_camera_codec_command).toString(16),
+      "hex"
+    );
+  }
+
+  // PHOTO AND VIDEO
+  photo_and_video(action) {
+    const request_camera_codec_spec_command =
+      this.command_header() +
+      this.data_len("0100") +
+      this.sequence("0000") +
+      this.COMMAND_ID.PHOTO_AND_VIDEO +
+      action;
+    console.log("PHOTO AND RECORD COMMAND ...");
+
+    return Buffer.from(
+      request_camera_codec_spec_command +
+        this.verify_command(request_camera_codec_spec_command).toString(16),
+      "hex"
+    );
+  }
+
+  // PARSE INCOMING BUFFER
+  parseBuffer(buffer) {
+    // const buff_array = Array.from(buffer);
+    const buff_array = this.convert_buffer_to_hex_array(buffer);
+    // console.log(buff_array);
+    // console.log(buff_array[this.PROT_CONSTANT.COMMAND_ID_INDEX]);
+
+    switch (buff_array[this.PROT_CONSTANT.COMMAND_ID_INDEX]) {
+      case this.COMMAND_ID.CAMERA_FIRMWARE_VERSION:
+        this.unpack_fw_version(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
+
+      case this.COMMAND_ID.CAMERA_CODEC_SPEC:
+        // console.log("Here");
+        this.unpack_camera_codec(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
+
+      case this.COMMAND_ID.GIMBAL_CONFIG_INFO:
+        this.unpack_gimbal_camera_configuration(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
+
+      case this.COMMAND_ID.FUNCTION_FEEDBACK_INFO.toLowerCase():
+        this.unpack_function_feedback(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
+    }
+  }
+
+  // UNPACKING FW VERSION
+  unpack_fw_version(data) {
+    const code_board_ver =
+      Number(data[2]) + "." + Number(data[1]) + "." + Number(data[0]);
+    const gimbal_firmware_ver =
+      Number(data[6]) + "." + Number(data[5]) + "." + Number(data[4]);
+
+    this.emit("FIRMWARE_VERSION", {
+      code_board_ver: code_board_ver,
+      gimbal_firmware_ver: gimbal_firmware_ver,
+      zoom_firmware_ver: "Not Supported",
+    });
+  }
+
+  // UNPACK CAMERA CODEC
+  unpack_camera_codec(data) {
+    // console.log("Inside Camera Codec", data);
+    const stream_type = Number(data[0]);
+    const VideoEncType = Number(data[1]);
+    const Resolution_L = Number("0x" + data[3] + data[2]);
+    const Resolution_H = Number("0x" + data[5] + data[4]);
+    const VideoBitrate = Number("0x" + data[7] + data[6]);
+    const VideoFrameRate = Number("0x" + data[8]);
+
+    this.emit("CAMERA_CODEC", {
+      stream_type: stream_type,
+      VideoEncType: VideoEncType,
+      Resolution_L: Resolution_L,
+      Resolution_H: Resolution_H,
+      VideoBitrate: VideoBitrate,
+      VideoFrameRate: VideoFrameRate,
+    });
+  }
+
+  // UNPACK CAMERA GIMBAL CONFIGURATION
+  unpack_gimbal_camera_configuration(data) {
+    this.emit("GIMBAL_CONFIG_INFO", {
+      hdr_sta: Number(data[1]),
+      record_sta: Number(data[3]),
+      gimbal_motion_mode: Number(data[4]),
+      gimbal_mounting_dir: Number(data[5]),
+      video_hdmi_or_cvbs: Number(data[6]),
+    });
+  }
+
+  // UNPACK FUNCTION FEEDBACK INFO
+
+  unpack_function_feedback(data) {
+    this.emit("FUNCTION_FEEDBACK_INFO", {
+      info_type: Number(data[0]),
+      custom_status: "0 Means Success",
+    });
+  }
+  // CONVERTING BUFFER TO HE ARRAY
+  convert_buffer_to_hex_array(buffer) {
+    const hexString = buffer.toString("hex");
+    const hexArray = [];
+    for (let i = 0; i < hexString.length; i += 2) {
+      hexArray.push(hexString.substring(i, i + 2));
+    }
+
+    return hexArray;
+  }
 }
+
+util.inherits(SiyiA8SDK, events.EventEmitter);
 
 module.exports = SiyiA8SDK;

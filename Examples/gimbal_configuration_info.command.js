@@ -1,7 +1,7 @@
 const dgram = require("dgram");
 const siYiCameraClient = dgram.createSocket("udp4"); //CREATING A UDP SOCKET TO CONNECT TO THE CAMERA
 
-const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CLASS
+const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS
 const mySiyiCamera = new SiyiA8SDK();
 
 const SIYI_CAMERA_UDP_IP_ADDERSS = "192.168.144.25"; // REPLACE WITH THE CAMERA's IP ADDRESS
@@ -11,20 +11,20 @@ siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDERSS);
 
 siYiCameraClient.on("connect", () => {
   console.log("Connected to Camera");
-  siYiCameraClient.send(mySiyiCamera.request_camera_fw_version());
+  siYiCameraClient.send(mySiyiCamera.request_gimbal_configuaration_info());
 });
 
 siYiCameraClient.on("error", () => {
   console.log("Error Connecting to Camera");
 });
 
-console.log("Getting FW Version");
+console.log("Getting Camera Codec ...");
 
 siYiCameraClient.on("message", (response) => {
-  // console.log("Received Response Buffer from Camera : ", response);
+  console.log("Received Response Buffer from Camera : ", response);
   mySiyiCamera.parseBuffer(response);
 });
 
-mySiyiCamera.on("FIRMWARE_VERSION", (data) => {
+mySiyiCamera.on("GIMBAL_CONFIG_INFO", (data) => {
   console.log(data);
 });

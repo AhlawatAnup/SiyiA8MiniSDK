@@ -104,14 +104,6 @@ siYiCameraClient.on("error", () => {
 
 console.log("Getting FW Version");
 
-siYiCameraClient.on("message", (response) => {
-  // console.log("Received Response Buffer from Camera : ", response);
-  mySiyiCamera.parseBuffer(response);
-});
-
-mySiyiCamera.on("FIRMWARE_VERSION", (data) => {
-  console.log(data);
-});
 ```
 
 ### READING FIRWARE ACKNOWLEDGEMENT

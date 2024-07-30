@@ -5,9 +5,21 @@ class SiyiA8SDK {
   //COMMAND ID (1 BYTE) ...DEFINING THE COMMANDS IDs.
   //REFER TO THE A8_MINI_MANUAL.PDF( ATTACHED).FOR MORE IDS CURENTLY THESE 3 ARE IMPLEMENTED
   COMMAND_ID = {
-    CENTER_CAMERA: "08",
+    CAMERA_FIRMWARE_VERSION: "01",
+    CAMERA_HARDWARE_ID: "02",
+    AUTO_FOCUS: "04",
+    MANUAL_ZOOM_AND_AUTO_FOCUS: "05",
+    MANUAL_FOCUS: "06",
     GIMBAL_ROTATION: "07",
-    ZOOM_ID: "05",
+    CENTER_CAMERA: "08",
+    CAMERA_IMAGE_MODE_REQUEST: "10",
+    ABSOLUTE_ZOOM_AND_AUTO_FOCUS: "0F",
+    MAX_ZOOM_VALUE_REQUEST: "16",
+    CURRENT_ZOOM_VALUE_REQUEST: "18",
+    CAMERA_PRESENT_WORKING_MODE: "19",
+    CAMERA_CODEC_SPEC: "20",
+    SEND_CODEC_SPEC: "21",
+    PHOTO_AND_VIDEO: "0C",
   };
 
   //   COMMAND HEADER STX+ CTRL (2+ 1 BYTES)
@@ -27,7 +39,6 @@ class SiyiA8SDK {
   }
 
   //   VERIFY COMMAND TO ADD CRC16 CHECKSUM
-
   verify_command(command) {
     return this.calculateCRC16(command);
   }
@@ -120,7 +131,7 @@ class SiyiA8SDK {
       this.command_header() +
       this.data_len("0100") +
       this.sequence("0000") +
-      this.COMMAND_ID.ZOOM_ID +
+      this.COMMAND_ID.MANUAL_ZOOM_AND_AUTO_FOCUS +
       "01";
     console.log(
       this.verify_command(start_zoom_command).toString(16),
@@ -140,7 +151,7 @@ class SiyiA8SDK {
       this.command_header() +
       this.data_len("0100") +
       this.sequence("0000") +
-      this.COMMAND_ID.ZOOM_ID +
+      this.COMMAND_ID.MANUAL_ZOOM_AND_AUTO_FOCUS +
       "00";
     console.log(
       this.verify_command(stop_zoom_command).toString(16),
@@ -152,6 +163,7 @@ class SiyiA8SDK {
       "hex"
     );
   }
+
   // ZOOM OUT
   zoom_out() {
     // IT WILL STOP THE ZOOM
@@ -159,7 +171,7 @@ class SiyiA8SDK {
       this.command_header() +
       this.data_len("0100") +
       this.sequence("0000") +
-      this.COMMAND_ID.ZOOM_ID +
+      this.COMMAND_ID.MANUAL_ZOOM_AND_AUTO_FOCUS +
       "ff";
     console.log(
       this.verify_command(zoom_out_command).toString(16),
@@ -168,6 +180,44 @@ class SiyiA8SDK {
     );
     return Buffer.from(
       zoom_out_command + this.verify_command(zoom_out_command).toString(16),
+      "hex"
+    );
+  }
+
+  request_camera_codec(stream_type) {
+    const request_camera_codec_spec_command =
+      this.command_header() +
+      this.data_len("0100") +
+      this.sequence("0000") +
+      this.COMMAND_ID.CAMERA_CODEC_SPEC +
+      stream_type;
+    console.log(
+      this.verify_command(request_camera_codec_spec_command).toString(16),
+      "  :",
+      request_camera_codec_spec_command
+    );
+    return Buffer.from(
+      request_camera_codec_spec_command +
+        this.verify_command(request_camera_codec_spec_command).toString(16),
+      "hex"
+    );
+  }
+
+  request_camera_fw_version() {
+    const request_camera_fw_version_command =
+      this.command_header() +
+      this.data_len("0000") +
+      this.sequence("0000") +
+      this.COMMAND_ID.CAMERA_FIRMWARE_VERSION +
+      "";
+    console.log(
+      this.verify_command(request_camera_fw_version_command).toString(16),
+      "  :",
+      request_camera_fw_version_command
+    );
+    return Buffer.from(
+      request_camera_fw_version_command +
+        this.verify_command(request_camera_fw_version_command).toString(16),
       "hex"
     );
   }

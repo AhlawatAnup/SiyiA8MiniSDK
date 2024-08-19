@@ -36,6 +36,7 @@ class SiyiA8SDK {
     GIMBAL_CONFIG_INFO: "0a",
     PHOTO_AND_VIDEO: "0C",
     FUNCTION_FEEDBACK_INFO: "0B",
+    GPS_DATA_TO_CAMERA: "3E",
   };
 
   //   COMMAND HEADER STX+ CTRL (2+ 1 BYTES)
@@ -297,6 +298,39 @@ class SiyiA8SDK {
     );
   }
 
+  // SEND GPS DATA TO GIMBAL
+  send_gps_data_to_camera(
+    time_boot_ms,
+    lat,
+    lon,
+    alt,
+    alt_ellipsoid,
+    vn,
+    ve,
+    vd
+  ) {
+    const send_gps_data_command =
+      this.command_header() +
+      this.data_len("2000") +
+      this.sequence("0000") +
+      this.COMMAND_ID.GPS_DATA_TO_CAMERA +
+      this.convert_decimal_to_hex(time_boot_ms, 4) +
+      this.convert_decimal_to_hex(lat, 4) +
+      this.convert_decimal_to_hex(lon, 4) +
+      this.convert_decimal_to_hex(alt, 4) +
+      this.convert_decimal_to_hex(alt_ellipsoid, 4) +
+      this.convert_decimal_to_hex(vn, 4) +
+      this.convert_decimal_to_hex(ve, 4) +
+      this.convert_decimal_to_hex(vd, 4);
+    console.log("GPS DATA TO CAMERA ...", send_gps_data_command);
+
+    return Buffer.from(
+      send_gps_data_command +
+        this.verify_command(send_gps_data_command).toString(16),
+      "hex"
+    );
+  }
+
   // PARSE INCOMING BUFFER
   parseBuffer(buffer) {
     // const buff_array = Array.from(buffer);
@@ -410,6 +444,22 @@ class SiyiA8SDK {
     }
 
     return hexArray;
+  }
+
+  //CONVERT DECIMAL TO HEX FIRST VALUE IS DECIMAL EQUIVALENT AND OTHER IS BYTE LENGTH
+  // LOWER BYTE AT THE FRONT
+  convert_decimal_to_hex(decimalValue, byteLength) {
+    if (decimalValue < 0) {
+      let mask = BigInt(1) << BigInt(byteLength * 8);
+      decimalValue = mask + BigInt(decimalValue);
+    }
+
+    return decimalValue
+      .toString(16)
+      .padStart(byteLength * 2, "0")
+      .match(/.{2}/g)
+      .reverse()
+      .join("");
   }
 }
 

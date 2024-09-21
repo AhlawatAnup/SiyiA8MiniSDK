@@ -1,5 +1,5 @@
 {
-  "name": "siyia8mini",
+  "name": "SiYi Camers SDK",
   "version": "1.0.1",
   "description": "This is Javascript Implementation of Siyi A8 Mini SDK with features like Zoom-In, Zoom-Out, movements and all. It has been tested on Node js In Raspberry Pi , Windows and Linux 22.",
   "main": "index.js",
@@ -7,9 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "SiyiA8Mini",
-    "SiYi",
-    "Camera"
+    "Siyi A8 Mini",
+    "SiYi A2 Mini",
+    "Camera SDK",
+    "SiYi ZR10"
   ],
   "author": "A.Ahlawat",
   "license": "ISC",

@@ -261,7 +261,7 @@ class SiyiA8SDK {
       this.sequence("0000") +
       this.COMMAND_ID.SEND_CODEC_SPEC +
       "01" +
-      "02" +
+      "01" +
       "80" +
       "07" +
       "38" +

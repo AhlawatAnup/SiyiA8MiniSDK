@@ -1,10 +1,10 @@
-const events = require("node:events");
-util = require("util");
+// BUFFER FO BROWSER
+var Buffer = require("buffer/").Buffer;
 
 // Declaring a Class
-class SiyiA8SDK {
+class SiyiA8SDK extends EventTarget {
   constructor() {
-    // this.eventEmitter = new EventEmitter();
+    super();
   }
 
   // PROTOCOL CONSTANTS
@@ -16,8 +16,7 @@ class SiyiA8SDK {
     COMMAND_ID_INDEX: 7, // 1 BYTE
     DATA_INDEX: 8, // DATA LENGTH BYTES
   };
-  //COMMAND ID (1 BYTE) ...DEFINING THE COMMANDS IDs.
-  //REFER TO THE A8_MINI_MANUAL.PDF( ATTACHED).FOR MORE IDS CURENTLY THESE 3 ARE IMPLEMENTED
+
   COMMAND_ID = {
     CAMERA_FIRMWARE_VERSION: "01",
     CAMERA_HARDWARE_ID: "02",
@@ -36,7 +35,6 @@ class SiyiA8SDK {
     GIMBAL_CONFIG_INFO: "0a",
     PHOTO_AND_VIDEO: "0C",
     FUNCTION_FEEDBACK_INFO: "0B",
-    GPS_DATA_TO_CAMERA: "3E",
   };
 
   //   COMMAND HEADER STX+ CTRL (2+ 1 BYTES)
@@ -61,6 +59,7 @@ class SiyiA8SDK {
   }
 
   //   CALCULATING CRC16 CHECSUM
+
   calculateCRC16(hexString) {
     const polynomial = 0x1021; // CRC-16-CCITT polynomial
     let crc = 0x0; // Initial value
@@ -81,7 +80,7 @@ class SiyiA8SDK {
     return ((crc & 0xff) << 8) | ((crc >> 8) & 0xff);
   }
 
-  // COMMAND TO CENTER THE CAMERA TO INITAL POSITION
+  // COMMAND TO CENTER THE CAMERA TO INITIAL POSITION
   center_command() {
     const center_command =
       this.command_header() +
@@ -97,9 +96,9 @@ class SiyiA8SDK {
   }
 
   //   THIS COMMAND WILL ROTATE THE GIMBAL(MORE THE DEGREE FAST IT WILL ROTATE)
-  //   ALERT!!!! THIS WON'T ROTATE THE GIMABL TO SPECIFC ANGLE BUT THESE DEGREE DEFINE THE
-  //   SPEED OF ROTATION TO ROTATE THE CAMERA AT PATICULAR ANGLE YOU HAVE HANDLE THE LOGIC TO
-  //   STOP THE CAMERA UNDER STOP CAMERA COMMAND(DEGREE SHOULD BE HEXADECIAL)
+  //   ALERT!!!! THIS WON'T ROTATE THE GIMBAL TO SPECIFIC ANGLE BUT THESE DEGREE DEFINE THE
+  //   SPEED OF ROTATION TO ROTATE THE CAMERA AT PARTICULAR ANGLE YOU HAVE HANDLE THE LOGIC TO
+  //   STOP THE CAMERA UNDER STOP CAMERA COMMAND(DEGREE SHOULD BE HEXADECIMAL)
   gimbal_rotate_command(YAW_IN_DEGREE, PITCH_IN_DEGREE) {
     const rotate_gimbal_command =
       this.command_header() +
@@ -260,7 +259,7 @@ class SiyiA8SDK {
       this.sequence("0000") +
       this.COMMAND_ID.SEND_CODEC_SPEC +
       "01" +
-      "01" +
+      "02" +
       "80" +
       "07" +
       "38" +
@@ -297,62 +296,9 @@ class SiyiA8SDK {
     );
   }
 
-  // SEND GPS DATA TO GIMBAL
-  send_gps_data_to_camera(
-    time_boot_ms,
-    lat,
-    lon,
-    alt,
-    alt_ellipsoid,
-    vn,
-    ve,
-    vd
-  ) {
-    const send_gps_data_command =
-      this.command_header() +
-      this.data_len("2000") +
-      this.sequence("0000") +
-      this.COMMAND_ID.GPS_DATA_TO_CAMERA +
-      this.convert_decimal_to_hex(time_boot_ms, 4) +
-      this.convert_decimal_to_hex(lat, 4) +
-      this.convert_decimal_to_hex(lon, 4) +
-      this.convert_decimal_to_hex(alt, 4) +
-      this.convert_decimal_to_hex(alt_ellipsoid, 4) +
-      this.convert_decimal_to_hex(vn, 4) +
-      this.convert_decimal_to_hex(ve, 4) +
-      this.convert_decimal_to_hex(vd, 4);
-    console.log("GPS DATA TO CAMERA ...", send_gps_data_command);
-
-    return Buffer.from(
-      send_gps_data_command +
-        this.verify_command(send_gps_data_command).toString(16),
-      "hex"
-    );
-  }
-
-  // SEND HARDWARE ID
-
-  request_hardware_id() {
-    const request_camera_hardware_id =
-      this.command_header() +
-      this.data_len("0000") +
-      this.sequence("0000") +
-      this.COMMAND_ID.CAMERA_HARDWARE_ID;
-    console.log("HARDWARE REQUEST");
-    return Buffer.from(
-      request_camera_hardware_id +
-        this.verify_command(request_camera_hardware_id).toString(16),
-      "hex"
-    );
-  }
-
   // PARSE INCOMING BUFFER
   parseBuffer(buffer) {
-    // const buff_array = Array.from(buffer);
-    const buff_array = this.convert_buffer_to_hex_array(buffer);
-    // console.log(buff_array);
-    // console.log(buff_array[this.PROT_CONSTANT.COMMAND_ID_INDEX]);
-
+    const buff_array = this.convert_buffer_to_hex_array(new Uint8Array(buffer));
     switch (buff_array[this.PROT_CONSTANT.COMMAND_ID_INDEX]) {
       case this.COMMAND_ID.CAMERA_FIRMWARE_VERSION:
         this.unpack_fw_version(
@@ -394,16 +340,6 @@ class SiyiA8SDK {
           )
         );
         break;
-
-      case this.COMMAND_ID.CAMERA_HARDWARE_ID.toLowerCase():
-        this.unpack_function_feedback(
-          buff_array.splice(
-            this.PROT_CONSTANT.DATA_INDEX,
-            this.PROT_CONSTANT.DATA_INDEX +
-              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
-          )
-        );
-        break;
     }
   }
 
@@ -414,11 +350,15 @@ class SiyiA8SDK {
     const gimbal_firmware_ver =
       Number(data[6]) + "." + Number(data[5]) + "." + Number(data[4]);
 
-    this.emit("FIRMWARE_VERSION", {
-      code_board_ver: code_board_ver,
-      gimbal_firmware_ver: gimbal_firmware_ver,
-      zoom_firmware_ver: "Not Supported",
-    });
+    this.dispatchEvent(
+      new CustomEvent("FIRMWARE_VERSION", {
+        detail: {
+          code_board_ver: code_board_ver,
+          gimbal_firmware_ver: gimbal_firmware_ver,
+          zoom_firmware_ver: "Not Supported",
+        },
+      })
+    );
   }
 
   // UNPACK CAMERA CODEC
@@ -431,70 +371,57 @@ class SiyiA8SDK {
     const VideoBitrate = Number("0x" + data[7] + data[6]);
     const VideoFrameRate = Number("0x" + data[8]);
 
-    this.emit("CAMERA_CODEC", {
-      stream_type: stream_type,
-      VideoEncType: VideoEncType,
-      Resolution_L: Resolution_L,
-      Resolution_H: Resolution_H,
-      VideoBitrate: VideoBitrate,
-      VideoFrameRate: VideoFrameRate,
-    });
+    this.dispatchEvent(
+      new CustomEvent("CAMERA_CODEC", {
+        detail: {
+          stream_type: stream_type,
+          VideoEncType: VideoEncType,
+          Resolution_L: Resolution_L,
+          Resolution_H: Resolution_H,
+          VideoBitrate: VideoBitrate,
+          VideoFrameRate: VideoFrameRate,
+        },
+      })
+    );
   }
 
   // UNPACK CAMERA GIMBAL CONFIGURATION
   unpack_gimbal_camera_configuration(data) {
-    this.emit("GIMBAL_CONFIG_INFO", {
-      hdr_sta: Number(data[1]),
-      record_sta: Number(data[3]),
-      gimbal_motion_mode: Number(data[4]),
-      gimbal_mounting_dir: Number(data[5]),
-      video_hdmi_or_cvbs: Number(data[6]),
-    });
+    this.dispatchEvent(
+      new CustomEvent("GIMBAL_CONFIG_INFO", {
+        detail: {
+          hdr_sta: Number(data[1]),
+          record_sta: Number(data[3]),
+          gimbal_motion_mode: Number(data[4]),
+          gimbal_mounting_dir: Number(data[5]),
+          video_hdmi_or_cvbs: Number(data[6]),
+        },
+      })
+    );
   }
 
   // UNPACK FUNCTION FEEDBACK INFO
   unpack_function_feedback(data) {
-    this.emit("FUNCTION_FEEDBACK_INFO", {
-      info_type: Number(data[0]),
-      custom_status: "0 Means Success",
-    });
+    this.dispatchEvent(
+      new CustomEvent("FUNCTION_FEEDBACK_INFO", {
+        detail: {
+          info_type: Number(data[0]),
+          custom_status: "0 Means Success",
+        },
+      })
+    );
   }
-
-  // UNPACK CAMERA HARDWARE ID
-  unpack_camera_hardware_id(data) {
-    this.emit("CAMERA_HARDWARE_ID", {
-      hardware_id: data[1],
-    });
-  }
-
   // CONVERTING BUFFER TO HE ARRAY
   convert_buffer_to_hex_array(buffer) {
-    const hexString = buffer.toString("hex");
     const hexArray = [];
-    for (let i = 0; i < hexString.length; i += 2) {
-      hexArray.push(hexString.substring(i, i + 2));
-    }
-
+    buffer.forEach((element) => {
+      let hex = element.toString(16);
+      if (hex.length == 1) hex = "0" + hex;
+      hexArray.push(hex);
+      // console.log(hex);
+    });
     return hexArray;
-  }
-
-  // CONVERT DECIMAL TO HEX FIRST VALUE IS DECIMAL EQUIVALENT AND OTHER IS BYTE LENGTH
-  // LOWER BYTE AT THE FRONT
-  convert_decimal_to_hex(decimalValue, byteLength) {
-    if (decimalValue < 0) {
-      let mask = BigInt(1) << BigInt(byteLength * 8);
-      decimalValue = mask + BigInt(decimalValue);
-    }
-
-    return decimalValue
-      .toString(16)
-      .padStart(byteLength * 2, "0")
-      .match(/.{2}/g)
-      .reverse()
-      .join("");
   }
 }
 
-util.inherits(SiyiA8SDK, events.EventEmitter);
-
-module.exports = SiyiA8SDK;
+export { SiyiA8SDK };

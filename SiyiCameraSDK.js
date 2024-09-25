@@ -1,7 +1,7 @@
 const events = require("node:events");
 util = require("util");
 
-// Declaring a Class
+// SIYI CLASS
 class SiyiA8SDK {
   constructor() {
     // this.eventEmitter = new EventEmitter();
@@ -16,8 +16,8 @@ class SiyiA8SDK {
     COMMAND_ID_INDEX: 7, // 1 BYTE
     DATA_INDEX: 8, // DATA LENGTH BYTES
   };
-  //COMMAND ID (1 BYTE) ...DEFINING THE COMMANDS IDs.
-  //REFER TO THE A8_MINI_MANUAL.PDF( ATTACHED).FOR MORE IDS CURENTLY THESE 3 ARE IMPLEMENTED
+  //  COMMAND ID (1 BYTE) ...DEFINING THE COMMANDS IDs.
+  //  REFER TO THE A8_MINI_MANUAL.PDF( ATTACHED).FOR MORE IDS CURRENTLY THESE 3 ARE IMPLEMENTED
   COMMAND_ID = {
     CAMERA_FIRMWARE_VERSION: "01",
     CAMERA_HARDWARE_ID: "02",
@@ -33,6 +33,7 @@ class SiyiA8SDK {
     CAMERA_PRESENT_WORKING_MODE: "19",
     CAMERA_CODEC_SPEC: "20",
     SEND_CODEC_SPEC: "21",
+    ATTITUDE_DATA: "22",
     GIMBAL_CONFIG_INFO: "0a",
     PHOTO_AND_VIDEO: "0C",
     FUNCTION_FEEDBACK_INFO: "0B",
@@ -60,7 +61,7 @@ class SiyiA8SDK {
     return this.calculateCRC16(command);
   }
 
-  //   CALCULATING CRC16 CHECSUM
+  //   CALCULATING CRC16 CHECKSUM
   calculateCRC16(hexString) {
     const polynomial = 0x1021; // CRC-16-CCITT polynomial
     let crc = 0x0; // Initial value
@@ -81,7 +82,7 @@ class SiyiA8SDK {
     return ((crc & 0xff) << 8) | ((crc >> 8) & 0xff);
   }
 
-  // COMMAND TO CENTER THE CAMERA TO INITAL POSITION
+  //   COMMAND TO CENTER THE CAMERA TO INITAL POSITION
   center_command() {
     const center_command =
       this.command_header() +
@@ -99,7 +100,7 @@ class SiyiA8SDK {
   //   THIS COMMAND WILL ROTATE THE GIMBAL(MORE THE DEGREE FAST IT WILL ROTATE)
   //   ALERT!!!! THIS WON'T ROTATE THE GIMABL TO SPECIFC ANGLE BUT THESE DEGREE DEFINE THE
   //   SPEED OF ROTATION TO ROTATE THE CAMERA AT PATICULAR ANGLE YOU HAVE HANDLE THE LOGIC TO
-  //   STOP THE CAMERA UNDER STOP CAMERA COMMAND(DEGREE SHOULD BE HEXADECIAL)
+  //   STOP THE CAMERA UNDER STOP CAMERA COMMAND(DEGREE SHOULD BE HEXADECIMAL)
   gimbal_rotate_command(YAW_IN_DEGREE, PITCH_IN_DEGREE) {
     const rotate_gimbal_command =
       this.command_header() +
@@ -119,6 +120,7 @@ class SiyiA8SDK {
       "hex"
     );
   }
+
   // THIS WILL STOP THE CAMERA ROTATION
   stop_gimbal_rotation() {
     const stop_gimbal_command =
@@ -221,7 +223,7 @@ class SiyiA8SDK {
   }
 
   // REQUEST GIMBAL CONFIGURATION INFO
-  request_gimbal_configuaration_info() {
+  request_gimbal_configuration_info() {
     const gimbal_config_info_command =
       this.command_header() +
       this.data_len("0000") +
@@ -318,9 +320,9 @@ class SiyiA8SDK {
       this.convert_decimal_to_hex(lon, 4) +
       this.convert_decimal_to_hex(alt, 4) +
       this.convert_decimal_to_hex(alt_ellipsoid, 4) +
-      this.convert_decimal_to_hex(vn, 4) +
-      this.convert_decimal_to_hex(ve, 4) +
-      this.convert_decimal_to_hex(vd, 4);
+      this.floatToIEEE754(vn) +
+      this.floatToIEEE754(ve) +
+      this.floatToIEEE754(vd);
     console.log("GPS DATA TO CAMERA ...", send_gps_data_command);
 
     return Buffer.from(
@@ -331,7 +333,6 @@ class SiyiA8SDK {
   }
 
   // SEND HARDWARE ID
-
   request_hardware_id() {
     const request_camera_hardware_id =
       this.command_header() +
@@ -342,6 +343,26 @@ class SiyiA8SDK {
     return Buffer.from(
       request_camera_hardware_id +
         this.verify_command(request_camera_hardware_id).toString(16),
+      "hex"
+    );
+  }
+
+  // SEND ATTITUDE DATA TO CAMERA
+  send_attitude_data(roll, pitch, yaw, rollspeed, pitchspeed, yawspeed) {
+    const send_attitude_data =
+      this.command_header() +
+      this.data_len("1800") +
+      this.sequence("0000") +
+      this.COMMAND_ID.ATTITUDE_DATA +
+      this.floatToIEEE754(roll) +
+      this.floatToIEEE754(pitch) +
+      this.floatToIEEE754(yaw) +
+      this.floatToIEEE754(rollspeed) +
+      this.floatToIEEE754(pitchspeed) +
+      this.floatToIEEE754(yawspeed);
+    console.log("Sending Attitude Data");
+    return Buffer.from(
+      send_attitude_data + this.verify_command(send_attitude_data).toString(16),
       "hex"
     );
   }
@@ -492,6 +513,16 @@ class SiyiA8SDK {
       .match(/.{2}/g)
       .reverse()
       .join("");
+  }
+
+  // CONVERT FLOAT TO HEX
+  floatToIEEE754(value) {
+    // 32 BITS SINGLE PRECISION FLOAT
+    const buffer = Buffer.alloc(4);
+    // LITTLE ENDIAN FLOAT
+    buffer.writeFloatLE(value, 0);
+    // CONVERT TO HEX
+    return buffer.toString("hex");
   }
 }
 

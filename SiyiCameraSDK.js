@@ -38,6 +38,7 @@ class SiyiA8SDK {
     PHOTO_AND_VIDEO: "0C",
     FUNCTION_FEEDBACK_INFO: "0B",
     GPS_DATA_TO_CAMERA: "3E",
+    FORMAT_SD_CARD: "48",
   };
 
   //   COMMAND HEADER STX+ CTRL (2+ 1 BYTES)
@@ -367,6 +368,20 @@ class SiyiA8SDK {
     );
   }
 
+  // FORMAT SD CARD
+  format_sd_card() {
+    const format_sd_card =
+      this.command_header() +
+      this.data_len("0000") +
+      this.sequence("0000") +
+      this.COMMAND_ID.FORMAT_SD_CARD;
+    console.log("SD CARD FORMAT");
+    return Buffer.from(
+      format_sd_card + this.verify_command(format_sd_card).toString(16),
+      "hex"
+    );
+  }
+
   // PARSE INCOMING BUFFER
   parseBuffer(buffer) {
     // const buff_array = Array.from(buffer);
@@ -418,6 +433,16 @@ class SiyiA8SDK {
 
       case this.COMMAND_ID.CAMERA_HARDWARE_ID.toLowerCase():
         this.unpack_function_feedback(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
+
+      case this.COMMAND_ID.FORMAT_SD_CARD.toLowerCase():
+        this.unpack_format_sd_card_ack(
           buff_array.splice(
             this.PROT_CONSTANT.DATA_INDEX,
             this.PROT_CONSTANT.DATA_INDEX +
@@ -485,6 +510,13 @@ class SiyiA8SDK {
   unpack_camera_hardware_id(data) {
     this.emit("CAMERA_HARDWARE_ID", {
       hardware_id: data[1],
+    });
+  }
+
+  // UNPACK FORMAT SD CARD ACK
+  unpack_format_sd_card_ack(data) {
+    this.emit("FORMAT_SD_CARD", {
+      format_sta: data[1],
     });
   }
 

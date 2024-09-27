@@ -516,7 +516,7 @@ class SiyiA8SDK {
   // UNPACK FORMAT SD CARD ACK
   unpack_format_sd_card_ack(data) {
     this.emit("FORMAT_SD_CARD", {
-      format_sta: data[1],
+      format_sta: data[0],
     });
   }
 

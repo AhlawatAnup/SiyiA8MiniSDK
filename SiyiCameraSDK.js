@@ -349,19 +349,37 @@ class SiyiA8SDK {
   }
 
   // SEND ATTITUDE DATA TO CAMERA
-  send_attitude_data(roll, pitch, yaw, rollspeed, pitchspeed, yawspeed) {
+  send_attitude_data(
+    time_boot_ms,
+    roll,
+    pitch,
+    yaw,
+    rollspeed,
+    pitchspeed,
+    yawspeed
+  ) {
     const send_attitude_data =
       this.command_header() +
-      this.data_len("1800") +
+      this.data_len("1C00") +
       this.sequence("0000") +
       this.COMMAND_ID.ATTITUDE_DATA +
+      this.convert_decimal_to_hex(time_boot_ms, 4) +
       this.floatToIEEE754(roll) +
       this.floatToIEEE754(pitch) +
       this.floatToIEEE754(yaw) +
       this.floatToIEEE754(rollspeed) +
       this.floatToIEEE754(pitchspeed) +
       this.floatToIEEE754(yawspeed);
-    console.log("Sending Attitude Data");
+
+    console.log(this.ieee754ToFloat(this.floatToIEEE754(pitch)));
+    console.log(
+      "Sending Attitude Data...",
+      Buffer.from(
+        send_attitude_data +
+          this.verify_command(send_attitude_data).toString(16),
+        "hex"
+      )
+    );
     return Buffer.from(
       send_attitude_data + this.verify_command(send_attitude_data).toString(16),
       "hex"

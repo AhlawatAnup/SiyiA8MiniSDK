@@ -495,6 +495,16 @@ class SiyiA8SDK {
           )
         );
         break;
+
+      case this.COMMAND_ID.CENTER_CAMERA.toLowerCase():
+        this.unpack_center_camera_ack(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
     }
   }
 
@@ -571,6 +581,13 @@ class SiyiA8SDK {
       yaw: Number("0x" + data[1] + data[0]) / 10,
       pitch: Number("0x" + data[3] + data[2]) / 10,
       roll: Number("0x" + data[5] + data[4]),
+    });
+  }
+
+  // UNPACK CENTER COMMAND
+  unpack_center_camera_ack(data) {
+    this.emit("CENTER_CAMERA", {
+      sta: data[0],
     });
   }
 

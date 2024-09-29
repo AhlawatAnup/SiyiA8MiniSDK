@@ -317,14 +317,14 @@ class SiyiA8SDK {
       this.data_len("2000") +
       this.sequence("0000") +
       this.COMMAND_ID.GPS_DATA_TO_CAMERA +
-      Buffer.alloc(4).writeInt32LE(time_boot_ms, 0) +
-      Buffer.alloc(4).writeInt32LE(lat, 0) +
-      Buffer.alloc(4).writeInt32LE(lon, 0) +
-      Buffer.alloc(4).writeInt32LE(alt, 0) +
-      Buffer.alloc(4).writeInt32LE(alt_ellipsoid, 0) +
-      this.floatToIEEE754(vn) +
-      this.floatToIEEE754(ve) +
-      this.floatToIEEE754(vd);
+      this.createBufferFromInt32(time_boot_ms) +
+      this.createBufferFromInt32(lat) +
+      this.createBufferFromInt32(lon) +
+      this.createBufferFromInt32(alt) +
+      this.createBufferFromInt32(alt_ellipsoid) +
+      this.createBufferFromFloat(vn) +
+      this.createBufferFromFloat(ve) +
+      this.createBufferFromFloat(vd);
     console.log("GPS DATA TO CAMERA ...", send_gps_data_command);
 
     return Buffer.from(
@@ -364,13 +364,13 @@ class SiyiA8SDK {
       this.data_len("1C00") +
       this.sequence("0000") +
       this.COMMAND_ID.ATTITUDE_DATA +
-      Buffer.alloc(4).writeInt32LE(time_boot_ms, 0) +
-      this.floatToIEEE754(roll) +
-      this.floatToIEEE754(pitch) +
-      this.floatToIEEE754(yaw) +
-      this.floatToIEEE754(rollspeed) +
-      this.floatToIEEE754(pitchspeed) +
-      this.floatToIEEE754(yawspeed);
+      this.createBufferFromInt32(time_boot_ms) +
+      this.createBufferFromFloat(roll) +
+      this.createBufferFromFloat(pitch) +
+      this.createBufferFromFloat(yaw) +
+      this.createBufferFromFloat(rollspeed) +
+      this.createBufferFromFloat(pitchspeed) +
+      this.createBufferFromFloat(yawspeed);
 
     console.log(
       "Sending Attitude Data...",
@@ -407,9 +407,9 @@ class SiyiA8SDK {
       this.data_len("0400") +
       this.sequence("0000") +
       this.COMMAND_ID.GIMBAL_CONTROL_ANGLE +
-      this.int16ToLittleEndian(yaw) +
-      this.int16ToLittleEndian(pitch);
-
+      this.createBufferFromInt16(yaw) +
+      this.createBufferFromInt16(pitch);
+    console.log(send_gimbal_angle_control);
     return Buffer.from(
       send_gimbal_angle_control +
         this.verify_command(send_gimbal_angle_control).toString(16),
@@ -568,9 +568,9 @@ class SiyiA8SDK {
   // UNPACK GIMBAL CONTROL ANGLE ACK
   unpack_gimbal_control_angle(data) {
     this.emit("GIMBAL_CONTROL_ANGLE", {
-      yaw: data[1] + data[0],
-      pitch: data[3] + data[2],
-      roll: 0,
+      yaw: Number("0x" + data[1] + data[0]) / 10,
+      pitch: Number("0x" + data[3] + data[2]) / 10,
+      roll: Number("0x" + data[5] + data[4]),
     });
   }
 
@@ -586,13 +586,23 @@ class SiyiA8SDK {
   }
 
   // CONVERT FLOAT TO HEX
-  floatToIEEE754(value) {
-    return Buffer.alloc(4).writeFloatLE(value, 0).toString("hex");
+  createBufferFromFloat(value) {
+    const buffer = Buffer.alloc(4);
+    buffer.writeFloatLE(value, 0);
+    return buffer.toString("hex");
   }
 
   // CONVERT VALUE TO INT16 LITTLE ENDIAN
-  int16ToLittleEndian(value) {
-    return Buffer.alloc(2).writeInt16LE(value, 0);
+  createBufferFromInt16(value) {
+    const buffer = Buffer.alloc(2);
+    buffer.writeInt16LE(value, 0);
+    return buffer.toString("hex");
+  }
+
+  createBufferFromInt32(value) {
+    const buffer = Buffer.alloc(4); // Allocate 4 bytes
+    buffer.writeInt32LE(value, 0); // Write the integer in little-endian format at offset 0
+    return buffer.toString("hex");
   }
 }
 

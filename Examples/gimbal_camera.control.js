@@ -18,7 +18,7 @@ siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDERSS);
 
 siYiCameraClient.on("connect", () => {
   console.log("Connected to Camera");
-  siYiCameraClient.send(mySiyiCamera.send_angle_control_gimbal(1000, -900));
+  siYiCameraClient.send(mySiyiCamera.send_angle_control_gimbal(0, 0));
 });
 
 siYiCameraClient.on("error", () => {

@@ -34,9 +34,10 @@ class SiyiA8SDK {
     CAMERA_CODEC_SPEC: "20",
     SEND_CODEC_SPEC: "21",
     ATTITUDE_DATA: "22",
-    GIMBAL_CONFIG_INFO: "0a",
+    GIMBAL_CONFIG_INFO: "0A",
     PHOTO_AND_VIDEO: "0C",
     FUNCTION_FEEDBACK_INFO: "0B",
+    GIMBAL_CONTROL_ANGLE: "0E",
     GPS_DATA_TO_CAMERA: "3E",
     FORMAT_SD_CARD: "48",
   };
@@ -316,11 +317,11 @@ class SiyiA8SDK {
       this.data_len("2000") +
       this.sequence("0000") +
       this.COMMAND_ID.GPS_DATA_TO_CAMERA +
-      this.convert_decimal_to_hex(time_boot_ms, 4) +
-      this.convert_decimal_to_hex(lat, 4) +
-      this.convert_decimal_to_hex(lon, 4) +
-      this.convert_decimal_to_hex(alt, 4) +
-      this.convert_decimal_to_hex(alt_ellipsoid, 4) +
+      Buffer.alloc(4).writeInt32LE(time_boot_ms, 0) +
+      Buffer.alloc(4).writeInt32LE(lat, 0) +
+      Buffer.alloc(4).writeInt32LE(lon, 0) +
+      Buffer.alloc(4).writeInt32LE(alt, 0) +
+      Buffer.alloc(4).writeInt32LE(alt_ellipsoid, 0) +
       this.floatToIEEE754(vn) +
       this.floatToIEEE754(ve) +
       this.floatToIEEE754(vd);
@@ -363,7 +364,7 @@ class SiyiA8SDK {
       this.data_len("1C00") +
       this.sequence("0000") +
       this.COMMAND_ID.ATTITUDE_DATA +
-      this.convert_decimal_to_hex(time_boot_ms, 4) +
+      Buffer.alloc(4).writeInt32LE(time_boot_ms, 0) +
       this.floatToIEEE754(roll) +
       this.floatToIEEE754(pitch) +
       this.floatToIEEE754(yaw) +
@@ -371,7 +372,6 @@ class SiyiA8SDK {
       this.floatToIEEE754(pitchspeed) +
       this.floatToIEEE754(yawspeed);
 
-    console.log(this.ieee754ToFloat(this.floatToIEEE754(pitch)));
     console.log(
       "Sending Attitude Data...",
       Buffer.from(
@@ -396,6 +396,23 @@ class SiyiA8SDK {
     console.log("SD CARD FORMAT");
     return Buffer.from(
       format_sd_card + this.verify_command(format_sd_card).toString(16),
+      "hex"
+    );
+  }
+
+  // SEND CONTROL TO GIMBAL
+  send_angle_control_gimbal(yaw, pitch) {
+    const send_gimbal_angle_control =
+      this.command_header() +
+      this.data_len("0400") +
+      this.sequence("0000") +
+      this.COMMAND_ID.GIMBAL_CONTROL_ANGLE +
+      this.int16ToLittleEndian(yaw) +
+      this.int16ToLittleEndian(pitch);
+
+    return Buffer.from(
+      send_gimbal_angle_control +
+        this.verify_command(send_gimbal_angle_control).toString(16),
       "hex"
     );
   }
@@ -461,6 +478,16 @@ class SiyiA8SDK {
 
       case this.COMMAND_ID.FORMAT_SD_CARD.toLowerCase():
         this.unpack_format_sd_card_ack(
+          buff_array.splice(
+            this.PROT_CONSTANT.DATA_INDEX,
+            this.PROT_CONSTANT.DATA_INDEX +
+              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+          )
+        );
+        break;
+
+      case this.COMMAND_ID.GIMBAL_CONTROL_ANGLE.toLowerCase():
+        this.unpack_gimbal_control_angle(
           buff_array.splice(
             this.PROT_CONSTANT.DATA_INDEX,
             this.PROT_CONSTANT.DATA_INDEX +
@@ -538,7 +565,16 @@ class SiyiA8SDK {
     });
   }
 
-  // CONVERTING BUFFER TO HE ARRAY
+  // UNPACK GIMBAL CONTROL ANGLE ACK
+  unpack_gimbal_control_angle(data) {
+    this.emit("GIMBAL_CONTROL_ANGLE", {
+      yaw: data[1] + data[0],
+      pitch: data[3] + data[2],
+      roll: 0,
+    });
+  }
+
+  // CONVERTING BUFFER TO HEX ARRAY
   convert_buffer_to_hex_array(buffer) {
     const hexString = buffer.toString("hex");
     const hexArray = [];
@@ -549,30 +585,14 @@ class SiyiA8SDK {
     return hexArray;
   }
 
-  // CONVERT DECIMAL TO HEX FIRST VALUE IS DECIMAL EQUIVALENT AND OTHER IS BYTE LENGTH
-  // LOWER BYTE AT THE FRONT
-  convert_decimal_to_hex(decimalValue, byteLength) {
-    if (decimalValue < 0) {
-      let mask = BigInt(1) << BigInt(byteLength * 8);
-      decimalValue = mask + BigInt(decimalValue);
-    }
-
-    return decimalValue
-      .toString(16)
-      .padStart(byteLength * 2, "0")
-      .match(/.{2}/g)
-      .reverse()
-      .join("");
-  }
-
   // CONVERT FLOAT TO HEX
   floatToIEEE754(value) {
-    // 32 BITS SINGLE PRECISION FLOAT
-    const buffer = Buffer.alloc(4);
-    // LITTLE ENDIAN FLOAT
-    buffer.writeFloatLE(value, 0);
-    // CONVERT TO HEX
-    return buffer.toString("hex");
+    return Buffer.alloc(4).writeFloatLE(value, 0).toString("hex");
+  }
+
+  // CONVERT VALUE TO INT16 LITTLE ENDIAN
+  int16ToLittleEndian(value) {
+    return Buffer.alloc(2).writeInt16LE(value, 0);
   }
 }
 

@@ -1,15 +1,25 @@
-# Siyi A8 Mini Camera Node.js SDK v1.0.1
+# SiYi Camera Node.js SDK v1.0.1
 
 ## THIS IS OPEN SOURCE IMPLEMENTATION, CHANGES AND ERROR REQUEST WILL BE APPRECIATED
 
 This is the Node Js implementation of Siyi Camera SDK.
 
-The Siyi A8 Mini Camera Node.js SDK allows developers to easily integrate the Siyi A8 Mini camera into their Node.js applications. With this short SDK/library, you can access the camera's features and functionalities programmatically, enabling seamless control and interaction with the camera.
+The SiYi Camera Node.js SDK allows developers to easily integrate the SiYi cameras into their Node.js applications. With this short SDK/library, you can access the camera's features and functionalities programmatically, enabling seamless control and interaction with the camera.
 
 ### Features:
 
 Currently it supports
-Zoom-In, Zoom-Out, Pitch-Up, Pitch-Down, Yaw-CCW, Yaw-CW, Read Firmware Version,Rea Camera Codec Info, Send Camera Codec Info , Trigger Photo and Video Capture.
+
+-> Zoom In/Out
+-> Pitch Up/Down
+-> Yaw CCW/CW
+-> Read Firmware Version
+-> Read/Send Camera Codec Info
+-> Trigger Photo/Video Capture
+-> Send GPS and Attitude Data (for drones)
+-> Parse Camera Acknowledgements (dot notation)
+-> Gimbal Absolute Movements
+-> Format SD Card
 
 ### v1.0.1
 
@@ -18,7 +28,7 @@ Buffer Parser: This feature aids in interpreting the camera response in a more r
 
 Check Examples to Get Overview.
 
-# Here is the Example code and Explanation to the Implemetation of Zoom-In Feature.
+# Here is the Example code and Explanation to the Implementation of Zoom-In Feature.
 
 ### FIRST CREATE A UDP CLIENT TO CONNECT TO THE CAMERA
 

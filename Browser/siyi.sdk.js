@@ -576,7 +576,7 @@ class SiyiA8SDK extends EventTarget {
   unpack_camera_hardware_id(data) {
     this.dispatchEvent(
       new CustomEvent("CAMERA_HARDWARE_ID", {
-        hardware_id: data[1],
+        detail: { hardware_id: data[1] },
       })
     );
   }
@@ -585,7 +585,9 @@ class SiyiA8SDK extends EventTarget {
   unpack_format_sd_card_ack(data) {
     this.dispatchEvent(
       new CustomEvent("FORMAT_SD_CARD", {
-        format_sta: data[0],
+        detail: {
+          format_sta: data[0],
+        },
       })
     );
   }
@@ -594,9 +596,11 @@ class SiyiA8SDK extends EventTarget {
   unpack_gimbal_control_angle(data) {
     this.dispatchEvent(
       new CustomEvent("GIMBAL_CONTROL_ANGLE", {
-        yaw: Number("0x" + data[1] + data[0]) / 10,
-        pitch: Number("0x" + data[3] + data[2]) / 10,
-        roll: Number("0x" + data[5] + data[4]),
+        detail: {
+          yaw: Number("0x" + data[1] + data[0]) / 10,
+          pitch: Number("0x" + data[3] + data[2]) / 10,
+          roll: Number("0x" + data[5] + data[4]),
+        },
       })
     );
   }
@@ -605,7 +609,9 @@ class SiyiA8SDK extends EventTarget {
   unpack_center_camera_ack(data) {
     this.dispatchEvent(
       new CustomEvent("CENTER_CAMERA", {
-        sta: data[0],
+        detail: {
+          sta: data[0],
+        },
       })
     );
   }

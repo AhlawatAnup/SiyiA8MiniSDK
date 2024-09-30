@@ -5,11 +5,11 @@ const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CLASS
 const mySiyiCamera = new SiyiA8SDK();
 
 const {
-  SIYI_CAMERA_UDP_IP_ADDERSS,
+  SIYI_CAMERA_UDP_IP_ADDRESS,
   SIYI_CAMERA_UDP_PORT,
 } = require("./camera.config");
 
-siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDERSS);
+siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDRESS);
 
 // YAW: ZR10 / A8 MINI: -135.0 ~ 135.0 DEGREES
 // YAW: ZT6 / ZR30: -270.0 ~ 270.0 DEGREES

@@ -40,7 +40,7 @@ const siYiCameraClient = dgram.createSocket("udp4");
 ### NOW IMPORT NODE JS SDK CLASS AND CREATE A OBJECT TO USE IT
 
 ```
-const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CALSS
+const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CLASS
 const mySiyiCamera = new SiyiA8SDK();
 ```
 
@@ -49,12 +49,12 @@ const mySiyiCamera = new SiyiA8SDK();
 ```
 
 const {
-  SIYI_CAMERA_UDP_IP_ADDERSS,
+  SIYI_CAMERA_UDP_IP_ADDRESS,
   SIYI_CAMERA_UDP_PORT,
 } = require("./camera.config");  //CREATE "camera.config.js" FILE AND EXPORT YOUR CAMERA ADDRESS AND PORT TO ACCESS
 
 // CONNECT TO UDP SOCKET
-siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDERSS);
+siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDRESS);
 
 // ATTACHING SOME COMMON LISTENER
 siYiCameraClient.on("connect", () => {

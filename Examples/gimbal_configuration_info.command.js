@@ -5,15 +5,15 @@ const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CLASS
 const mySiyiCamera = new SiyiA8SDK();
 
 const {
-  SIYI_CAMERA_UDP_IP_ADDERSS,
+  SIYI_CAMERA_UDP_IP_ADDRESS,
   SIYI_CAMERA_UDP_PORT,
 } = require("./camera.config");
 
-siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDERSS);
+siYiCameraClient.connect(SIYI_CAMERA_UDP_PORT, SIYI_CAMERA_UDP_IP_ADDRESS);
 
 siYiCameraClient.on("connect", () => {
   console.log("Connected to Camera");
-  siYiCameraClient.send(mySiyiCamera.request_gimbal_configuaration_info());
+  siYiCameraClient.send(mySiyiCamera.request_gimbal_configuration_info());
 });
 
 siYiCameraClient.on("error", () => {

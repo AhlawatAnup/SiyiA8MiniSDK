@@ -292,7 +292,14 @@ class SiyiA8SDK {
       this.sequence("0000") +
       this.COMMAND_ID.PHOTO_AND_VIDEO +
       action;
-    console.log("PHOTO AND RECORD COMMAND ...");
+    console.log(
+      "PHOTO AND RECORD COMMAND ...",
+      Buffer.from(
+        request_camera_codec_spec_command +
+          this.verify_command(request_camera_codec_spec_command).toString(16),
+        "hex"
+      )
+    );
 
     return Buffer.from(
       request_camera_codec_spec_command +
@@ -341,12 +348,10 @@ class SiyiA8SDK {
       this.data_len("0000") +
       this.sequence("0000") +
       this.COMMAND_ID.CAMERA_HARDWARE_ID;
-    console.log("HARDWARE REQUEST");
-    return Buffer.from(
-      request_camera_hardware_id +
-        this.verify_command(request_camera_hardware_id).toString(16),
-      "hex"
-    );
+
+    // CHECKSUM CALCULATION IS FAILING HERE SO I MANUALLY CALCULATE THE SAME
+    // WILL FIX THIS IN FUTURE
+    return Buffer.from(request_camera_hardware_id + "07f4", "hex");
   }
 
   // SEND ATTITUDE DATA TO CAMERA
@@ -446,7 +451,7 @@ class SiyiA8SDK {
         );
         break;
 
-      case this.COMMAND_ID.GIMBAL_CONFIG_INFO:
+      case this.COMMAND_ID.GIMBAL_CONFIG_INFO.toLowerCase():
         this.unpack_gimbal_camera_configuration(
           buff_array.splice(
             this.PROT_CONSTANT.DATA_INDEX,
@@ -467,11 +472,11 @@ class SiyiA8SDK {
         break;
 
       case this.COMMAND_ID.CAMERA_HARDWARE_ID.toLowerCase():
-        this.unpack_function_feedback(
+        this.unpack_camera_hardware_id(
           buff_array.splice(
             this.PROT_CONSTANT.DATA_INDEX,
             this.PROT_CONSTANT.DATA_INDEX +
-              buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX]
+              Number("0x" + buff_array[this.PROT_CONSTANT.DATA_LEN_INDEX])
           )
         );
         break;
@@ -564,7 +569,7 @@ class SiyiA8SDK {
   // UNPACK CAMERA HARDWARE ID
   unpack_camera_hardware_id(data) {
     this.emit("CAMERA_HARDWARE_ID", {
-      hardware_id: data[1],
+      hardware_id: data[0],
     });
   }
 

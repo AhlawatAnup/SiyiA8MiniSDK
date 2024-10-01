@@ -441,7 +441,7 @@ class SiyiA8SDK extends EventTarget {
         );
         break;
 
-      case this.COMMAND_ID.GIMBAL_CONFIG_INFO:
+      case this.COMMAND_ID.GIMBAL_CONFIG_INFO.toLowerCase():
         this.unpack_gimbal_camera_configuration(
           buff_array.splice(
             this.PROT_CONSTANT.DATA_INDEX,

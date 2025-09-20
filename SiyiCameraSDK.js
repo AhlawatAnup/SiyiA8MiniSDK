@@ -16,6 +16,7 @@ class SiyiA8SDK {
     COMMAND_ID_INDEX: 7, // 1 BYTE
     DATA_INDEX: 8, // DATA LENGTH BYTES
   };
+
   //  COMMAND ID (1 BYTE) ...DEFINING THE COMMANDS IDs.
   //  REFER TO THE A8_MINI_MANUAL.PDF( ATTACHED).FOR MORE IDS CURRENTLY THESE 3 ARE IMPLEMENTED
   COMMAND_ID = {
@@ -84,7 +85,7 @@ class SiyiA8SDK {
     return ((crc & 0xff) << 8) | ((crc >> 8) & 0xff);
   }
 
-  //   COMMAND TO CENTER THE CAMERA TO INITAL POSITION
+  //   COMMAND TO CENTER THE CAMERA TO INITIAL POSITION
   center_command() {
     const center_command =
       this.command_header() +
@@ -100,8 +101,8 @@ class SiyiA8SDK {
   }
 
   //   THIS COMMAND WILL ROTATE THE GIMBAL(MORE THE DEGREE FAST IT WILL ROTATE)
-  //   ALERT!!!! THIS WON'T ROTATE THE GIMABL TO SPECIFC ANGLE BUT THESE DEGREE DEFINE THE
-  //   SPEED OF ROTATION TO ROTATE THE CAMERA AT PATICULAR ANGLE YOU HAVE HANDLE THE LOGIC TO
+  //   ALERT!!!! THIS WON'T ROTATE THE GIMBAL TO SPECIFIC ANGLE BUT THESE DEGREE DEFINE THE
+  //   SPEED OF ROTATION TO ROTATE THE CAMERA AT PARTICULAR ANGLE YOU HAVE HANDLE THE LOGIC TO
   //   STOP THE CAMERA UNDER STOP CAMERA COMMAND(DEGREE SHOULD BE HEXADECIMAL)
   gimbal_rotate_command(YAW_IN_DEGREE, PITCH_IN_DEGREE) {
     const rotate_gimbal_command =
@@ -248,7 +249,10 @@ class SiyiA8SDK {
       this.sequence("0000") +
       this.COMMAND_ID.CAMERA_FIRMWARE_VERSION +
       "";
-    console.log("FIRMWARE VERSION REQUEST");
+    console.log(
+      "FIRMWARE VERSION REQUEST : ",
+      request_camera_fw_version_command
+    );
     return Buffer.from(
       request_camera_fw_version_command +
         this.verify_command(request_camera_fw_version_command).toString(16),

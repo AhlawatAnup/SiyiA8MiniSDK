@@ -1,0 +1,10 @@
+request_firmware_version :  <Buffer 55 66 01 00 00 00 00 01 64 c4>
+request_hardware_id :  <Buffer 55 66 01 00 00 00 00 02 07 f4>
+request_gimbal_mode :  <Buffer 55 66 01 00 00 00 00 19 5d 57>
+auto_focus :  <Buffer 55 66 01 05 00 00 00 04 01 00 04 cc 01 65 9d>
+manual_zoom_auto_focus :  <Buffer 55 66 01 01 00 00 00 05 01 8d 64>
+request_max_zoom_value :  <Buffer 55 66 01 00 00 00 00 16 b2 a6>
+request_current_zoom_value :  <Buffer 55 66 01 00 00 00 00 18 7c 47>
+manual_focus :  <Buffer 55 66 01 01 00 00 00 06 00 ff 21>
+gimbal_rotation :  <Buffer 55 66 01 02 00 00 00 07 32 ce 84 7f>
+center :  <Buffer 55 66 01 01 00 00 00 08 01 d1 12>

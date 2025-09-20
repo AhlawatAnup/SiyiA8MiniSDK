@@ -1,0 +1,180 @@
+{
+  "commands": [
+    {
+      "name": "request_firmware_version",
+      "cmdId": "0x01",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          { "name": "code_board_ver", "type": "uint32" },
+          { "name": "gimbal_firmware_ver", "type": "uint32" },
+          { "name": "zoom_firmware_ver", "type": "uint32" }
+        ]
+      }
+    },
+    {
+      "name": "request_hardware_id",
+      "cmdId": "0x02",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [{ "name": "hardware_id", "type": "string", "length": 12 }]
+      }
+    },
+
+    {
+      "name": "request_gimbal_mode",
+      "cmdId": "0x19",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [{ "name": "gimbal_mode", "type": "uint8" }]
+      }
+    },
+
+    {
+      "name": "auto_focus",
+      "cmdId": "0x04",
+      "request": {
+        "fields": [
+          { "name": "auto_focus", "type": "uint8", "valid_values": ["1"] },
+          { "name": "touch_x", "type": "uint16", "valid_values": ["AnyPos"] },
+          { "name": "touch_y", "type": "uint16", "valid_values": ["AnyPos"] }
+        ]
+      },
+      "response": {
+        "fields": [{ "name": "sta", "type": "uint8" }]
+      }
+    },
+
+    {
+      "name": "manual_zoom_auto_focus",
+      "cmdId": "0x05",
+      "request": {
+        "fields": [
+          { "name": "zoom", "type": "int8", "valid_values": ["1", "0", "-1"] }
+        ]
+      },
+      "response": {
+        "fields": [{ "name": "zoom_multiple", "type": "uint16" }]
+      }
+    },
+
+    {
+      "name": "absolute_zoom_auto_focus",
+      "cmdId": "0x0f",
+      "request": {
+        "fields": [
+          { "name": "absolute_movement_int", "type": "uint8" },
+          { "name": "absolute_movement_float", "type": "uint8" }
+        ]
+      },
+      "response": {
+        "fields": [{ "name": "absolute_movement_ask", "type": "uint8" }]
+      }
+    },
+
+    {
+      "name": "request_max_zoom_value",
+      "cmdId": "0x16",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          { "name": "zoom_max_int", "type": "uint8" },
+          { "name": "zoom_max_float", "type": "uint8" }
+        ]
+      }
+    },
+
+    {
+      "name": "request_current_zoom_value",
+      "cmdId": "0x18",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          { "name": "zoom_max_int", "type": "uint8" },
+          { "name": "zoom_max_float", "type": "uint8" }
+        ]
+      }
+    },
+
+    {
+      "name": "manual_focus",
+      "cmdId": "0x06",
+      "request": {
+        "fields": [
+          { "name": "focus", "type": "int8", "valid_values": ["1", "0", "-1"] }
+        ]
+      },
+      "response": {
+        "fields": [
+          { "name": "sta", "type": "uint8", "valid_values": ["1", "0"] }
+        ]
+      }
+    },
+
+    {
+      "name": "gimbal_rotation",
+      "cmdId": "0x07",
+      "request": {
+        "fields": [
+          {
+            "name": "turn_yaw",
+            "type": "int8",
+            "valid_values": ["-100", "0", "100"]
+          },
+          {
+            "name": "turn_pitch",
+            "type": "int8",
+            "valid_values": ["-100", "0", "100"]
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          { "name": "sta", "type": "uint8", "valid_values": ["1", "0"] }
+        ]
+      }
+    },
+
+    {
+      "name": "center",
+      "cmdId": "0x08",
+      "request": {
+        "fields": [
+          {
+            "name": "center_pos",
+            "type": "uint8",
+            "valid_values": ["1"]
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          { "name": "sta", "type": "uint8", "valid_values": ["1", "0"] }
+        ]
+      }
+    },
+
+    {
+      "name": "request_gimbal_config",
+      "cmdId": "0x0A",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          { "name": "sta", "type": "uint8", "valid_values": ["1", "0"] }
+        ]
+      }
+    }
+  ]
+}

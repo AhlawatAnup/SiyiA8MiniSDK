@@ -1,7 +1,7 @@
 const dgram = require("dgram");
 const siYiCameraClient = dgram.createSocket("udp4"); //CREATING A UDP SOCKET TO CONNECT TO THE CAMERA
 
-const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SIYI CLASS
+const SiyiA8SDK = require("../SiyiCameraSDK"); //IMPORTING SiYi CLASS
 const mySiyiCamera = new SiyiA8SDK();
 
 const {
@@ -15,6 +15,7 @@ siYiCameraClient.on("connect", () => {
   console.log("Connected to Camera");
   siYiCameraClient.send(mySiyiCamera.request_camera_fw_version());
 });
+siYiCameraClient.send(mySiyiCamera.request_camera_fw_version());
 
 siYiCameraClient.on("error", () => {
   console.log("Error Connecting to Camera");

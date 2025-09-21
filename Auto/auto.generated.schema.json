@@ -172,7 +172,322 @@
       },
       "response": {
         "fields": [
-          { "name": "sta", "type": "uint8", "valid_values": ["1", "0"] }
+          { "name": "reserved", "type": "uint8" },
+          { "name": "hdr_sta", "type": "uint8", "valid_values": ["0", "1"] },
+          { "name": "reserved_1", "type": "uint8" },
+          {
+            "name": "record_sta",
+            "type": "uint8",
+            "valid_values": ["0", "1", "2", "3"]
+          },
+          {
+            "name": "gimbal_motion_mode",
+            "type": "uint8",
+            "valid_values": ["0", "1", "2"]
+          },
+          {
+            "name": "gimbal_mounting_dir",
+            "type": "uint8",
+            "valid_values": ["0", "1", "2"]
+          },
+          {
+            "name": "video_hdmi_or_cvsb",
+            "type": "uint8",
+            "valid_values": ["0", "1"]
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "function_feedback",
+      "cmdId": "0x0B",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "info_type",
+            "type": "uint8",
+            "valid_values": ["0", "1", "2", "3", "4"]
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "photo_and_record",
+      "cmdId": "0x0C",
+      "request": {
+        "fields": [
+          {
+            "name": "func_type",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": []
+      }
+    },
+
+    {
+      "name": "request_gimbal_attitude",
+      "cmdId": "0x0D",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "yaw",
+            "type": "int16"
+          },
+          {
+            "name": "pitch",
+            "type": "int16"
+          },
+          {
+            "name": "roll",
+            "type": "int16"
+          },
+          {
+            "name": "yaw_velocity",
+            "type": "int16"
+          },
+          {
+            "name": "pitch_velocity",
+            "type": "int16"
+          },
+          {
+            "name": "roll_velocity",
+            "type": "int16"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "gimbal_angle_control",
+      "cmdId": "0x0E",
+      "request": {
+        "fields": [
+          {
+            "name": "yaw",
+            "type": "int16"
+          },
+          {
+            "name": "pitch",
+            "type": "int16"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "yaw",
+            "type": "int16"
+          },
+          {
+            "name": "pitch",
+            "type": "int16"
+          },
+          {
+            "name": "roll",
+            "type": "int16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "single_axis_control",
+      "cmdId": "0x41",
+      "request": {
+        "fields": [
+          {
+            "name": "angle",
+            "type": "int16"
+          },
+          {
+            "name": "single_control_flag",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "yaw",
+            "type": "int16"
+          },
+          {
+            "name": "pitch",
+            "type": "int16"
+          },
+          {
+            "name": "roll",
+            "type": "int16"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "request_camera_codec",
+      "cmdId": "0x20",
+      "request": {
+        "fields": [
+          {
+            "name": "req_stream_type",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "stream_type",
+            "type": "uint8"
+          },
+          {
+            "name": "video_enc_type",
+            "type": "uint8"
+          },
+          {
+            "name": "resolution_l",
+            "type": "uint16"
+          },
+          {
+            "name": "resolution_h",
+            "type": "uint16"
+          },
+          {
+            "name": "video_bitrate",
+            "type": "uint16"
+          },
+          {
+            "name": "video_frame_rate",
+            "type": "uint8"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "send_camera_codec",
+      "cmdId": "0x21",
+      "request": {
+        "fields": [
+          {
+            "name": "stream_type",
+            "type": "uint8"
+          },
+          {
+            "name": "video_enc_type",
+            "type": "uint8"
+          },
+          {
+            "name": "resolution_l",
+            "type": "uint16"
+          },
+          {
+            "name": "resolution_h",
+            "type": "uint16"
+          },
+          {
+            "name": "video_bitrate",
+            "type": "uint16"
+          },
+          {
+            "name": "reserve",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "stream_type",
+            "type": "uint8"
+          },
+          {
+            "name": "sta",
+            "type": "uint8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "request_camera_image_mode",
+      "cmdId": "0x20",
+      "request": {
+        "fields": []
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "vdisp_mode",
+            "type": "uint8"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "send_camera_image_mode",
+      "cmdId": "0x11",
+      "request": {
+        "fields": [
+          {
+            "name": "vdisp_mode",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "vdisp_mode",
+            "type": "uint8"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "request_point_temperature",
+      "cmdId": "0x12",
+      "request": {
+        "fields": [
+          {
+            "name": "x",
+            "type": "uint16"
+          },
+          {
+            "name": "y",
+            "type": "uint16"
+          },
+          {
+            "name": "get_temp_flag",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "temp",
+            "type": "uint8"
+          },
+          {
+            "name": "x",
+            "type": "uint16"
+          },
+          {
+            "name": "y",
+            "type": "uint16"
+          }
         ]
       }
     }

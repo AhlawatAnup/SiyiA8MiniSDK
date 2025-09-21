@@ -107,6 +107,7 @@ function getTypeSize(field) {
       return 2;
     case "uint32":
     case "int32":
+    case "float":
       return 4;
     case "string":
       return field.length;
@@ -132,6 +133,8 @@ function encode_payload(fields) {
       code.push(`buffer.writeUInt32LE(${f.name}, ${offset});`);
     } else if (f.type === "int32") {
       code.push(`buffer.writeInt32LE(${f.name}, ${offset});`);
+    } else if (f.type === "float") {
+      code.push(`buffer.writeFloatLE(${f.name}, ${offset});`);
     } else if (f.type === "string") {
       code.push(`buffer.write(${f.name}, ${offset}, ${f.length}, "ascii");`);
     }

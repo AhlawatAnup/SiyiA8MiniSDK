@@ -146,7 +146,152 @@ Siyi_camera.prototype.request_gimbal_config = function () {
 };
 
 Siyi_camera.prototype.decode_request_gimbal_config = function (buffer) {
-  this.emit("request_gimbal_config", { sta: buffer.readUInt8(0) });
+  this.emit("request_gimbal_config", {
+    reserved: buffer.readUInt8(0),
+    hdr_sta: buffer.readUInt8(1),
+    reserved_1: buffer.readUInt8(2),
+    record_sta: buffer.readUInt8(3),
+    gimbal_motion_mode: buffer.readUInt8(4),
+    gimbal_mounting_dir: buffer.readUInt8(5),
+    video_hdmi_or_cvsb: buffer.readUInt8(6),
+  });
+};
+// CMD: function_feedback (0x0B)
+Siyi_camera.prototype.function_feedback = function () {
+  const buffer = Buffer.alloc(0);
+
+  return this.encodePacket(0x0b, buffer);
+};
+
+Siyi_camera.prototype.decode_function_feedback = function (buffer) {
+  this.emit("function_feedback", { info_type: buffer.readUInt8(0) });
+};
+// CMD: photo_and_record (0x0C)
+Siyi_camera.prototype.photo_and_record = function (func_type) {
+  const buffer = Buffer.alloc(1);
+  buffer.writeUInt8(func_type, 0);
+  return this.encodePacket(0x0c, buffer);
+};
+
+Siyi_camera.prototype.decode_photo_and_record = function (buffer) {
+  this.emit("photo_and_record", {});
+};
+// CMD: request_gimbal_attitude (0x0D)
+Siyi_camera.prototype.request_gimbal_attitude = function () {
+  const buffer = Buffer.alloc(0);
+
+  return this.encodePacket(0x0d, buffer);
+};
+
+Siyi_camera.prototype.decode_request_gimbal_attitude = function (buffer) {
+  this.emit("request_gimbal_attitude", {});
+};
+// CMD: gimbal_angle_control (0x0E)
+Siyi_camera.prototype.gimbal_angle_control = function (yaw, pitch) {
+  const buffer = Buffer.alloc(4);
+  buffer.writeInt16LE(yaw, 0);
+  buffer.writeInt16LE(pitch, 2);
+  return this.encodePacket(0x0e, buffer);
+};
+
+Siyi_camera.prototype.decode_gimbal_angle_control = function (buffer) {
+  this.emit("gimbal_angle_control", {});
+};
+// CMD: single_axis_control (0x41)
+Siyi_camera.prototype.single_axis_control = function (
+  angle,
+  single_control_flag
+) {
+  const buffer = Buffer.alloc(3);
+  buffer.writeInt16LE(angle, 0);
+  buffer.writeUInt8(single_control_flag, 2);
+  return this.encodePacket(0x41, buffer);
+};
+
+Siyi_camera.prototype.decode_single_axis_control = function (buffer) {
+  this.emit("single_axis_control", {});
+};
+// CMD: request_camera_codec (0x20)
+Siyi_camera.prototype.request_camera_codec = function (req_stream_type) {
+  const buffer = Buffer.alloc(1);
+  buffer.writeUInt8(req_stream_type, 0);
+  return this.encodePacket(0x20, buffer);
+};
+
+Siyi_camera.prototype.decode_request_camera_codec = function (buffer) {
+  this.emit("request_camera_codec", {
+    stream_type: buffer.readUInt8(0),
+    video_enc_type: buffer.readUInt8(1),
+    resolution_l: buffer.readUInt16LE(2),
+    resolution_h: buffer.readUInt16LE(4),
+    video_bitrate: buffer.readUInt16LE(6),
+    video_frame_rate: buffer.readUInt8(8),
+  });
+};
+// CMD: send_camera_codec (0x21)
+Siyi_camera.prototype.send_camera_codec = function (
+  stream_type,
+  video_enc_type,
+  resolution_l,
+  resolution_h,
+  video_bitrate,
+  reserve
+) {
+  const buffer = Buffer.alloc(9);
+  buffer.writeUInt8(stream_type, 0);
+  buffer.writeUInt8(video_enc_type, 1);
+  buffer.writeUInt16LE(resolution_l, 2);
+  buffer.writeUInt16LE(resolution_h, 4);
+  buffer.writeUInt16LE(video_bitrate, 6);
+  buffer.writeUInt8(reserve, 8);
+  return this.encodePacket(0x21, buffer);
+};
+
+Siyi_camera.prototype.decode_send_camera_codec = function (buffer) {
+  this.emit("send_camera_codec", {
+    stream_type: buffer.readUInt8(0),
+    sta: buffer.readUInt8(1),
+  });
+};
+// CMD: request_camera_image_mode (0x20)
+Siyi_camera.prototype.request_camera_image_mode = function () {
+  const buffer = Buffer.alloc(0);
+
+  return this.encodePacket(0x20, buffer);
+};
+
+Siyi_camera.prototype.decode_request_camera_image_mode = function (buffer) {
+  this.emit("request_camera_image_mode", { vdisp_mode: buffer.readUInt8(0) });
+};
+// CMD: send_camera_image_mode (0x11)
+Siyi_camera.prototype.send_camera_image_mode = function (vdisp_mode) {
+  const buffer = Buffer.alloc(1);
+  buffer.writeUInt8(vdisp_mode, 0);
+  return this.encodePacket(0x11, buffer);
+};
+
+Siyi_camera.prototype.decode_send_camera_image_mode = function (buffer) {
+  this.emit("send_camera_image_mode", { vdisp_mode: buffer.readUInt8(0) });
+};
+// CMD: request_point_temperature (0x12)
+Siyi_camera.prototype.request_point_temperature = function (
+  x,
+  y,
+  get_temp_flag
+) {
+  const buffer = Buffer.alloc(5);
+  buffer.writeUInt16LE(x, 0);
+  buffer.writeUInt16LE(y, 2);
+  buffer.writeUInt8(get_temp_flag, 4);
+  return this.encodePacket(0x12, buffer);
+};
+
+Siyi_camera.prototype.decode_request_point_temperature = function (buffer) {
+  this.emit("request_point_temperature", {
+    temp: buffer.readUInt8(0),
+    x: buffer.readUInt16LE(1),
+    y: buffer.readUInt16LE(3),
+  });
 };
 
 // ENCODE THE PACKET
@@ -245,6 +390,36 @@ Siyi_camera.prototype.buffer_parser = function (buffer) {
       break;
     case 0x0a: // request_gimbal_config;
       this.decode_request_gimbal_config(data);
+      break;
+    case 0x0b: // function_feedback;
+      this.decode_function_feedback(data);
+      break;
+    case 0x0c: // photo_and_record;
+      this.decode_photo_and_record(data);
+      break;
+    case 0x0d: // request_gimbal_attitude;
+      this.decode_request_gimbal_attitude(data);
+      break;
+    case 0x0e: // gimbal_angle_control;
+      this.decode_gimbal_angle_control(data);
+      break;
+    case 0x41: // single_axis_control;
+      this.decode_single_axis_control(data);
+      break;
+    case 0x20: // request_camera_codec;
+      this.decode_request_camera_codec(data);
+      break;
+    case 0x21: // send_camera_codec;
+      this.decode_send_camera_codec(data);
+      break;
+    case 0x20: // request_camera_image_mode;
+      this.decode_request_camera_image_mode(data);
+      break;
+    case 0x11: // send_camera_image_mode;
+      this.decode_send_camera_image_mode(data);
+      break;
+    case 0x12: // request_point_temperature;
+      this.decode_request_point_temperature(data);
       break;
     default:
       console.log("Unknown command ID:", cmdId);

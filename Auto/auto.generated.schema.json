@@ -490,6 +490,27 @@
           }
         ]
       }
+    },
+
+    {
+      "name": "send_color_palette",
+      "cmdId": "0x1B",
+      "request": {
+        "fields": [
+          {
+            "name": "pseudo_color",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "pseudo_color",
+            "type": "uint8"
+          }
+        ]
+      }
     }
   ]
 }

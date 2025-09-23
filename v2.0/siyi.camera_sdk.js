@@ -293,6 +293,16 @@ Siyi_camera.prototype.decode_request_point_temperature = function (buffer) {
     y: buffer.readUInt16LE(3),
   });
 };
+// CMD: send_color_palette (0x1B)
+Siyi_camera.prototype.send_color_palette = function (pseudo_color) {
+  const buffer = Buffer.alloc(1);
+  buffer.writeUInt8(pseudo_color, 0);
+  return this.encodePacket(0x1b, buffer);
+};
+
+Siyi_camera.prototype.decode_send_color_palette = function (buffer) {
+  this.emit("send_color_palette", { pseudo_color: buffer.readUInt8(0) });
+};
 
 // ENCODE THE PACKET
 Siyi_camera.prototype.encodePacket = function (cmdId, payload) {
@@ -420,6 +430,9 @@ Siyi_camera.prototype.buffer_parser = function (buffer) {
       break;
     case 0x12: // request_point_temperature;
       this.decode_request_point_temperature(data);
+      break;
+    case 0x1b: // send_color_palette;
+      this.decode_send_color_palette(data);
       break;
     default:
       console.log("Unknown command ID:", cmdId);

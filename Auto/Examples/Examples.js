@@ -21,6 +21,7 @@ console.log("photo_and_record : ", camera.photo_and_record(2));
 camera.on("request_hardware_id", (mess) => {
   console.log("mess", mess);
 });
+
 camera.on("request_firmware_version", (mess) => {
   console.log("mess", mess);
 });

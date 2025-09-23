@@ -1,19 +1,28 @@
 // AUTO GENERATED SCHEMA CODE GENERATED
 const fs = require("fs");
 const schema = require("./auto.generated.schema.json");
-let output = `// THIS IS THE AUTO GENERATED FILE \n// DO NOT EDIT IT MANUALLY \n// IF YOU WANT TO ADD A NEW COMMAND MAKE A CHANGE TO SCHEMA`;
+const config = require("./auto.config");
+let node_output = `// THIS IS THE AUTO GENERATED FILE \n// DO NOT EDIT IT MANUALLY \n// IF YOU WANT TO ADD A NEW COMMAND MAKE A CHANGE TO SCHEMA`;
+let browser_output = node_output;
 
 // SiYi CAMERA CLASS
-output += `
+node_output += `
 // version : 2.0.0
 const events = require("node:events");
 util = require("util");
 Siyi_camera = function() {};
 `;
+
+browser_output += `
+// version : 2.0.0
+var Buffer = require("buffer/").Buffer;
+Siyi_camera = function() {};
+`;
+
 schema.commands.forEach((cmd) => {
   const request_encoder = encode_payload(cmd.request.fields);
   const response_parser = generate_decoder(cmd.response.fields);
-  output += `// CMD: ${cmd.name} (${cmd.cmdId.toString(16)})
+  node_output += `// CMD: ${cmd.name} (${cmd.cmdId.toString(16)})
 Siyi_camera.prototype.${cmd.name}=function(${cmd.request.fields
     .map((f) => f.name)
     .join(", ")}) {
@@ -28,7 +37,32 @@ Siyi_camera.prototype.decode_${cmd.name}=function (buffer) {
 `;
 });
 
-output += `
+// IF BROWSER TRUE
+schema.commands.forEach((cmd) => {
+  const request_encoder = encode_payload(cmd.request.fields);
+  const response_parser = generate_decoder(cmd.response.fields);
+  browser_output += `// CMD: ${cmd.name} (${cmd.cmdId.toString(16)})
+Siyi_camera.prototype.${cmd.name}=function(${cmd.request.fields
+    .map((f) => f.name)
+    .join(", ")}) {
+  const buffer = Buffer.alloc(${request_encoder.size});
+  ${request_encoder.code}
+  return this.encodePacket(${cmd.cmdId.toString(16)},buffer);
+}
+
+Siyi_camera.prototype.decode_${cmd.name}=function (buffer) {
+    this.emit("${cmd.name}",{ ${response_parser.code}});
+
+     this.dispatchEvent(
+      new CustomEvent("${cmd.name}", {
+        detail: { ${response_parser.code}},
+      })
+    );
+    }
+`;
+});
+
+let encode_output = `
 // ENCODE THE PACKET
 Siyi_camera.prototype.encodePacket=function(cmdId, payload) {
   const dataLen = payload ? payload.length : 0;
@@ -72,7 +106,11 @@ Siyi_camera.prototype.calculateCRC16=function(buffer) {
 }
 `;
 
-output += `Siyi_camera.prototype.buffer_parser=function(buffer) {
+node_output += encode_output;
+browser_output += encode_output;
+
+// BUFFER PARSER
+let buffer_parse_output = `Siyi_camera.prototype.buffer_parser=function(buffer) {
   let offset = 0;
   // STX
   const stx = buffer.readUInt16LE(offset);
@@ -93,8 +131,12 @@ output += `Siyi_camera.prototype.buffer_parser=function(buffer) {
   offset += dataLen;
   ${generateSwitch(schema)}
 };`;
-// EXPORT MODULE
-output += `util.inherits(Siyi_camera, events.EventEmitter);\nmodule.exports = {Siyi_camera};`;
+
+node_output += buffer_parse_output;
+browser_output += buffer_parse_output;
+
+// EXPORT MODULE AND EVENT EMITTER
+node_output += `util.inherits(Siyi_camera, events.EventEmitter);\nmodule.exports = {Siyi_camera};`;
 
 // GET SIZE OFFSET
 function getTypeSize(field) {
@@ -200,5 +242,6 @@ function generateSwitch(schema) {
 }
 
 // WRITE TO FILE
-fs.writeFileSync("siyi.camera_sdk.js", output);
+fs.writeFileSync("siyi.camera_sdk.js", node_output);
+fs.writeFileSync("siyi.browser.camera_sdk.js", browser_output);
 console.log("SiYi Camera SDK generated!");

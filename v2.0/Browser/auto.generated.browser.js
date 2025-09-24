@@ -1,20 +1,33 @@
 // AUTO GENERATED SCHEMA CODE GENERATED
 const fs = require("fs");
 const schema = require("./auto.generated.schema.json");
-let output = `// THIS IS THE AUTO GENERATED FILE \n// DO NOT EDIT IT MANUALLY \n// IF YOU WANT TO ADD A NEW COMMAND MAKE A CHANGE TO SCHEMA`;
+let browser_output = `// THIS IS THE AUTO GENERATED FILE \n// DO NOT EDIT IT MANUALLY \n// IF YOU WANT TO ADD A NEW COMMAND MAKE A CHANGE TO SCHEMA`;
 
 // SiYi CAMERA CLASS
-output += `
+
+browser_output += `
 // version : 2.0.0
-const events = require("node:events");
-util = require("util");
-Siyi_camera = function() {};
+var Buffer = require("buffer/").Buffer;
+const Siyi_camera = function() { this._et = new EventTarget();};
+
+Siyi_camera.prototype.addEventListener = function (type, listener) {
+  this._et.addEventListener(type, listener);
+};
+
+Siyi_camera.prototype.removeEventListener = function (type, listener) {
+  this._et.removeEventListener(type, listener);
+};
+
+Siyi_camera.prototype.dispatchEvent = function (event) {
+  return this._et.dispatchEvent(event);
+};
 `;
 
+// IF BROWSER TRUE
 schema.commands.forEach((cmd) => {
   const request_encoder = encode_payload(cmd.request.fields);
   const response_parser = generate_decoder(cmd.response.fields);
-  output += `// CMD: ${cmd.name} (${cmd.cmdId.toString(16)})
+  browser_output += `// CMD: ${cmd.name} (${cmd.cmdId.toString(16)})
 Siyi_camera.prototype.${cmd.name}=function(${cmd.request.fields
     .map((f) => f.name)
     .join(", ")}) {
@@ -24,7 +37,11 @@ Siyi_camera.prototype.${cmd.name}=function(${cmd.request.fields
 }
 
 Siyi_camera.prototype.decode_${cmd.name}=function (buffer) {
-    this.emit("${cmd.name}",{ ${response_parser.code}});
+     this.dispatchEvent(
+      new CustomEvent("${cmd.name}", {
+        detail: { ${response_parser.code}},
+      })
+    );
     }
 `;
 });
@@ -73,35 +90,36 @@ Siyi_camera.prototype.calculateCRC16=function(buffer) {
 }
 `;
 
-output += encode_output;
+browser_output += encode_output;
 
 // BUFFER PARSER
-let buffer_parse_output = `Siyi_camera.prototype.buffer_parser=function(buffer) {
+let buffer_parse_output = `Siyi_camera.prototype.buffer_parser=function(array_buffer) {
   let offset = 0;
+  const buffer = new DataView(array_buffer, offset, array_buffer.byteLength);
   // STX
-  const stx = buffer.readUInt16LE(offset);
+  const stx = buffer.getUint16(offset, true);
   offset += 2;
   if (stx !== 0x6655) return;
   // CTRL
-  const ctrl = buffer.readUInt8(offset++);
+  const ctrl = buffer.getUint8(offset++);
   // Data length
-  const dataLen = buffer.readUInt16LE(offset);
+  const dataLen = buffer.getUint16(offset, true);
   offset += 2;
   // SEQ
-  const seq = buffer.readUInt16LE(offset);
+  const seq = buffer.getUint16(offset, true);
   offset += 2;
   // CMD_ID
-  const cmdId = buffer.readUInt8(offset++);
+  const cmdId = buffer.getUint8(offset++);
   // DATA
-  const data = buffer.slice(offset, offset + dataLen);
+   const data = new DataView(array_buffer, offset, dataLen);
   offset += dataLen;
   ${generateSwitch(schema)}
 };`;
 
-output += buffer_parse_output;
+browser_output += buffer_parse_output;
 
 // EXPORT MODULE AND EVENT EMITTER
-output += `util.inherits(Siyi_camera, events.EventEmitter);\nmodule.exports = {Siyi_camera};`;
+browser_output += `export {Siyi_camera};`;
 
 // GET SIZE OFFSET
 function getTypeSize(field) {
@@ -155,11 +173,11 @@ function generate_decoder(fields) {
   let offset = 0;
   fields.forEach((f) => {
     if (f.type === "uint8") {
-      code.push(`${f.name}: buffer.readUInt8(${offset})`);
+      code.push(`${f.name}: buffer.getUint8(${offset})`);
     } else if (f.type === "uint16") {
-      code.push(`${f.name}: buffer.readUInt16LE(${offset})`);
+      code.push(`${f.name}: buffer.getUint16(${offset},true)`);
     } else if (f.type === "uint32") {
-      code.push(`${f.name}: buffer.readUInt32LE(${offset})`);
+      code.push(`${f.name}: buffer.getUint32(${offset},true)`);
     } else if (f.type === "string") {
       code.push(
         `${f.name}: buffer.toString("ascii", ${offset}, ${offset + f.length})`
@@ -169,28 +187,6 @@ function generate_decoder(fields) {
   });
   return { code: code.join(",\n    "), size: offset };
 }
-
-// DECODE PAYLOAD
-// function buffer_parser(buffer) {
-//   let offset = 0;
-//   // STX
-//   const stx = buffer.readUInt16LE(offset);
-//   offset += 2;
-//   if (stx !== 0x6655) return;
-//   // CTRL
-//   const ctrl = buffer.readUInt8(offset++);
-//   // Data length
-//   const dataLen = buffer.readUInt16LE(offset);
-//   offset += 2;
-//   // SEQ
-//   const seq = buffer.readUInt16LE(offset);
-//   offset += 2;
-//   // CMD_ID
-//   const cmdId = buffer.readUInt8(offset++);
-//   // DATA
-//   const data = buffer.slice(offset, offset + dataLen);
-//   offset += dataLen;
-// }
 
 // GENERATE SWITCH STATEMENT FOR BUFFER PARSER
 function generateSwitch(schema) {
@@ -207,5 +203,5 @@ function generateSwitch(schema) {
 }
 
 // WRITE TO FILE
-fs.writeFileSync("siyi.camera_sdk.js", output);
-console.log("SiYi Camera Nodejs SDK generated!");
+fs.writeFileSync("siyi.browser.camera_sdk.js", browser_output);
+console.log("SiYi Camera SDK generated!");

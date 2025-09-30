@@ -478,7 +478,7 @@
         "fields": [
           {
             "name": "temp",
-            "type": "uint8"
+            "type": "uint16"
           },
           {
             "name": "x",
@@ -508,6 +508,47 @@
           {
             "name": "pseudo_color",
             "type": "uint8"
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "request_min_max_image_temperature",
+      "cmdId": "0x14",
+      "request": {
+        "fields": [
+          {
+            "name": "get_temp_flag",
+            "type": "uint8"
+          }
+        ]
+      },
+      "response": {
+        "fields": [
+          {
+            "name": "temp_max",
+            "type": "uint16"
+          },
+          {
+            "name": "temp_min",
+            "type": "uint16"
+          },
+          {
+            "name": "temp_max_x",
+            "type": "uint16"
+          },
+          {
+            "name": "temp_max_y",
+            "type": "uint16"
+          },
+          {
+            "name": "temp_min_x",
+            "type": "uint16"
+          },
+          {
+            "name": "temp_min_y",
+            "type": "uint16"
           }
         ]
       }

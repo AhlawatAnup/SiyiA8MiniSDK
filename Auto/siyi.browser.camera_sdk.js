@@ -336,9 +336,9 @@ Siyi_camera.prototype.request_point_temperature=function(x, y, get_temp_flag) {
 Siyi_camera.prototype.decode_request_point_temperature=function (buffer) {
      this.dispatchEvent(
       new CustomEvent("request_point_temperature", {
-        detail: { temp: buffer.getUint8(0),
-    x: buffer.getUint16(1,true),
-    y: buffer.getUint16(3,true)},
+        detail: { temp: buffer.getUint16(0,true),
+    x: buffer.getUint16(2,true),
+    y: buffer.getUint16(4,true)},
       })
     );
     }
@@ -353,6 +353,25 @@ Siyi_camera.prototype.decode_send_color_palette=function (buffer) {
      this.dispatchEvent(
       new CustomEvent("send_color_palette", {
         detail: { pseudo_color: buffer.getUint8(0)},
+      })
+    );
+    }
+// CMD: request_min_max_image_temperature (0x14)
+Siyi_camera.prototype.request_min_max_image_temperature=function(get_temp_flag) {
+  const buffer = Buffer.alloc(1);
+  buffer.writeUInt8(get_temp_flag, 0);
+  return this.encodePacket(0x14,buffer);
+}
+
+Siyi_camera.prototype.decode_request_min_max_image_temperature=function (buffer) {
+     this.dispatchEvent(
+      new CustomEvent("request_min_max_image_temperature", {
+        detail: { temp_max: buffer.getUint16(0,true),
+    temp_min: buffer.getUint16(2,true),
+    temp_max_x: buffer.getUint16(4,true),
+    temp_max_y: buffer.getUint16(6,true),
+    temp_min_x: buffer.getUint16(8,true),
+    temp_min_y: buffer.getUint16(10,true)},
       })
     );
     }
@@ -487,6 +506,9 @@ Siyi_camera.prototype.buffer_parser=function(array_buffer) {
     break;
   case 0x1B: // send_color_palette;
     this.decode_send_color_palette(data)
+    break;
+  case 0x14: // request_min_max_image_temperature;
+    this.decode_request_min_max_image_temperature(data)
     break;
   default:
     console.log("Unknown command ID:", cmdId);

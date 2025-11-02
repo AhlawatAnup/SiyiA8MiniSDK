@@ -8,6 +8,7 @@ camera.on("request_hardware_id", (mess) => {
 camera.on("request_firmware_version", (mess) => {
   console.log("mess", mess);
 });
+
 camera.on("request_point_temperature", (mess) => {
   console.log("mess", mess);
 });

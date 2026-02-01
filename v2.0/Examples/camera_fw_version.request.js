@@ -15,7 +15,9 @@ siYiCameraClient.on("connect", () => {
   console.log("Connected to Camera");
   // siYiCameraClient.send(camera.request_firmware_version());
   // siYiCameraClient.send(camera.send_camera_image_mode(3));
-  siYiCameraClient.send(camera.send_color_palette(0));
+  // siYiCameraClient.send(camera.send_color_palette(3));
+  // siYiCameraClient.send(camera.send_camera_image_mode(7));
+  siYiCameraClient.send(camera.request_camera_image_mode());
 });
 // siYiCameraClient.send(mySiyiCamera.request_camera_fw_version());
 
@@ -27,6 +29,12 @@ console.log("Getting FW Version");
 
 camera.on("send_color_palette", (data) => {
   console.log("send_color_palette : ", data);
+});
+camera.on("request_camera_image_mode", (data) => {
+  console.log("request_camera_image_mode : ", data);
+});
+camera.on("send_camera_image_mode", (data) => {
+  console.log("send_camera_image_mode : ", data);
 });
 
 siYiCameraClient.on("message", (response) => {

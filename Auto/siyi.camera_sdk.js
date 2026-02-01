@@ -211,11 +211,11 @@ Siyi_camera.prototype.decode_send_camera_codec=function (buffer) {
     this.emit("send_camera_codec",{ stream_type: buffer.readUInt8(0),
     sta: buffer.readUInt8(1)});
     }
-// CMD: request_camera_image_mode (0x20)
+// CMD: request_camera_image_mode (0x10)
 Siyi_camera.prototype.request_camera_image_mode=function() {
   const buffer = Buffer.alloc(0);
   
-  return this.encodePacket(0x20,buffer);
+  return this.encodePacket(0x10,buffer);
 }
 
 Siyi_camera.prototype.decode_request_camera_image_mode=function (buffer) {
@@ -239,9 +239,9 @@ Siyi_camera.prototype.request_point_temperature=function(x, y, get_temp_flag) {
 }
 
 Siyi_camera.prototype.decode_request_point_temperature=function (buffer) {
-    this.emit("request_point_temperature",{ temp: buffer.readUInt8(0),
-    x: buffer.readUInt16LE(1),
-    y: buffer.readUInt16LE(3)});
+    this.emit("request_point_temperature",{ temp: buffer.readUInt16LE(0),
+    x: buffer.readUInt16LE(2),
+    y: buffer.readUInt16LE(4)});
     }
 // CMD: send_color_palette (0x1B)
 Siyi_camera.prototype.send_color_palette=function(pseudo_color) {
@@ -387,7 +387,7 @@ Siyi_camera.prototype.buffer_parser=function(buffer) {
   case 0x21: // send_camera_codec;
     this.decode_send_camera_codec(data)
     break;
-  case 0x20: // request_camera_image_mode;
+  case 0x10: // request_camera_image_mode;
     this.decode_request_camera_image_mode(data)
     break;
   case 0x11: // send_camera_image_mode;

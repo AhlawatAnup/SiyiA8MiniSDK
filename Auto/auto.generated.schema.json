@@ -420,7 +420,7 @@
     },
     {
       "name": "request_camera_image_mode",
-      "cmdId": "0x20",
+      "cmdId": "0x10",
       "request": {
         "fields": []
       },
